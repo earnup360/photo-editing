@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pro Thumbnail Designer</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Roboto:wght@400;500&family=Baloo+Da+2:wght@400;600&family=Hind+Siliguri:wght@400;600&family=Noto+Serif+Bengali:wght@400;600&family=Anek+Bangla:wght@400;600&family=Rajdhani:wght@400;600&family=Atma:wght@400;600&family=Galada:wght@400;600&family=Moulpali:wght@400;600&family=Tiro+Bangla:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Roboto:wght@400;500&family=Baloo+Da+2:wght@400;600&family=Hind+Siliguri:wght@400;600&family=Noto+Serif+Bengali:wght@400;600&family=Anek+Bangla:wght@400;600&family=Rajdhani:wght@400;600&family=Atma:wght@400;600&family=Galada:wght@400;600&family=Moulpali:wght@400;600&family=Tiro+Bengali:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
 
@@ -12,7 +12,7 @@
         /* CSS Variables for theming */
         :root {
             --primary-color: #f44336; /* Deep Red for actions/accents */
-            --secondary-color: #212121; /* Dark Black/Grey for sidebars */
+            --secondary-color: #212121; /* Dark Black/Grey for top/bottom bars */
             --accent-color: #424242; /* Medium Grey for buttons/hover */
             --bg-light: #eceff1; /* Light Grey for main background */
             --bg-dark: #b0bec5; /* Medium Grey for canvas area */
@@ -29,17 +29,18 @@
             margin: 0;
             padding: 0;
             display: flex;
+            flex-direction: column; /* Vertical layout */
             background-color: var(--bg-light);
             min-height: 100vh;
             overflow: hidden; /* Prevent scrolling */
-            touch-action: pan-y; /* Prevent vertical scrolling on touch */
+            touch-action: manipulation; /* Allow touch interactions without default browser actions */
             color: var(--text-dark);
         }
 
-        /* Portrait mode warning */
-        @media (orientation: portrait) {
+        /* Landscape mode warning (for vertical app) */
+        @media (orientation: landscape) {
             body::before {
-                content: "অনুগ্রহ করে সেরা অভিজ্ঞতার জন্য আপনার ডিভাইসটি অনুভূমিক (Landscape) মোডে ঘোরান।\nPlease rotate your device to landscape mode for best experience.";
+                content: "অনুগ্রহ করে সেরা অভিজ্ঞতার জন্য আপনার ডিভাইসটি উল্লম্ব (Portrait) মোডে ঘোরান।\nPlease rotate your device to portrait mode for best experience.";
                 position: fixed;
                 top: 0;
                 left: 0;
@@ -57,12 +58,13 @@
                 box-sizing: border-box;
             }
             .app-container {
-                display: none !important; /* Hide app in portrait */
+                display: none !important; /* Hide app in landscape */
             }
         }
 
         .app-container {
             display: flex;
+            flex-direction: column; /* Vertical layout */
             flex-grow: 1;
             background-color: var(--text-light);
             box-shadow: var(--shadow-medium);
@@ -71,53 +73,43 @@
             margin: 10px;
         }
 
-        /* Sidebar Styles */
-        .sidebar {
-            width: 70px; /* Wider for better touch targets */
+        /* Top Menu Bar (Save, Clear, Undo/Redo) */
+        .top-menu-bar {
+            height: 60px;
             background-color: var(--secondary-color);
             display: flex;
-            flex-direction: column;
+            justify-content: space-around;
             align-items: center;
-            padding: 10px 0;
+            padding: 0 10px;
             box-shadow: var(--shadow-soft);
             z-index: 10;
-            border-radius: var(--border-radius);
         }
-
-        .sidebar button {
+        .top-menu-bar button {
             background: none;
             border: none;
             color: rgba(255, 255, 255, 0.8);
-            font-size: 1.6em; /* Larger icons */
-            padding: 15px 0;
-            width: 100%;
+            font-size: 1.4em;
+            padding: 10px;
+            border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
+            transition: background-color 0.2s ease, color 0.2s ease;
             display: flex;
-            justify-content: center;
             align-items: center;
-            outline: none;
+            gap: 5px;
         }
-
-        .sidebar button:hover,
-        .sidebar button.active {
+        .top-menu-bar button:hover:not([disabled]), .top-menu-bar button:active:not([disabled]) {
             background-color: var(--primary-color);
             color: var(--text-light);
-            transform: scale(1.05);
         }
-        .sidebar button:active {
-            transform: scale(0.95);
-        }
-        .sidebar button[disabled] {
+        .top-menu-bar button[disabled] {
             opacity: 0.5;
             cursor: not-allowed;
-            background-color: transparent;
-            transform: none;
         }
+
 
         /* Canvas Area */
         .canvas-area {
-            flex-grow: 1;
+            flex-grow: 1; /* Takes most of the vertical space */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -130,9 +122,9 @@
         .canvas-wrapper {
             position: relative;
             width: 100%;
-            max-width: 1280px;
+            max-width: 1280px; /* Base width for calculation */
             height: auto;
-            aspect-ratio: 16 / 9;
+            aspect-ratio: 16 / 9; /* Maintain aspect ratio */
             background-color: var(--text-light);
             border: 3px solid var(--primary-color);
             box-shadow: var(--shadow-medium);
@@ -144,92 +136,77 @@
         }
         canvas {
             display: block;
+            width: 100%; /* Make canvas responsive inside wrapper */
+            height: 100%;
         }
 
-        /* Floating Controls (like Layer/Undo/Redo) */
-        .floating-controls {
-            position: absolute;
-            bottom: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 10px;
-            background-color: rgba(33, 33, 33, 0.9); /* secondary-color with transparency */
-            padding: 8px 15px;
-            border-radius: 25px;
-            box-shadow: var(--shadow-medium);
-            z-index: 20;
-        }
-        .floating-controls button {
-            background: none;
-            border: none;
-            color: var(--text-light);
-            font-size: 1.2em;
-            padding: 8px;
-            border-radius: 50%;
-            transition: background-color 0.2s;
+        /* Bottom Toolbar / Option Menu */
+        .bottom-toolbar {
+            height: 70px; /* Fixed height for toolbar */
+            background-color: var(--secondary-color);
             display: flex;
             align-items: center;
-            justify-content: center;
+            padding: 0 10px;
+            box-shadow: var(--shadow-soft);
+            z-index: 10;
+            overflow-x: auto; /* Enable horizontal scrolling */
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            white-space: nowrap; /* Prevent items from wrapping */
+            gap: 15px; /* Space between buttons */
         }
-        .floating-controls button:hover:not([disabled]),
-        .floating-controls button:active:not([disabled]) {
-            background-color: rgba(255, 255, 255, 0.2);
-            transform: scale(1.1);
+        .bottom-toolbar::-webkit-scrollbar {
+            display: none; /* Hide scrollbar for webkit browsers */
         }
-        .floating-controls button[disabled] {
-            color: rgba(255, 255, 255, 0.3);
-            cursor: not-allowed;
+        .bottom-toolbar {
+            -ms-overflow-style: none;  /* Hide scrollbar for IE and Edge */
+            scrollbar-width: none;  /* Hide scrollbar for Firefox */
         }
 
-        /* Zoom controls */
-        .zoom-controls {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            background-color: rgba(33, 33, 33, 0.8);
-            border-radius: var(--border-radius);
-            padding: 5px;
-            box-shadow: var(--shadow-soft);
-            z-index: 20;
-        }
-        .zoom-controls button {
+        .bottom-toolbar button {
+            flex-shrink: 0; /* Prevent buttons from shrinking */
             background: none;
             border: none;
-            color: var(--text-light);
-            font-size: 1.1em;
-            padding: 8px;
-            border-radius: 4px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.8em; /* Large icons for touch */
+            padding: 10px;
+            border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            outline: none;
         }
-        .zoom-controls button:hover, .zoom-controls button:active {
-            background-color: var(--accent-color);
+        .bottom-toolbar button:hover, .bottom-toolbar button.active {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            transform: scale(1.05);
+        }
+        .bottom-toolbar button:active {
+            transform: scale(0.95);
         }
 
-
-        /* Property Panel (Popup from right) */
+        /* Property Panel (Slides from bottom) */
         .property-panel {
             position: fixed;
-            top: 0;
-            right: 0;
-            width: 300px; /* Wider panel for more controls */
-            height: 100vh;
+            bottom: 0;
+            left: 0;
+            width: 100vw; /* Full width for properties */
+            max-height: 70vh; /* Max height to avoid covering canvas too much */
             background-color: var(--text-light);
-            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.25);
             z-index: 100;
             display: flex;
             flex-direction: column;
             padding: 20px;
-            transform: translateX(100%); /* Start off-screen */
+            transform: translateY(100%); /* Start off-screen */
             transition: transform 0.3s ease-out;
             overflow-y: auto; /* Enable scrolling for long panels */
+            border-top-left-radius: var(--border-radius);
+            border-top-right-radius: var(--border-radius);
         }
         .property-panel.active {
-            transform: translateX(0); /* Slide in */
+            transform: translateY(0); /* Slide in */
         }
         .property-panel h3 {
             font-family: 'Poppins', sans-serif;
@@ -261,16 +238,15 @@
             background-color: var(--bg-light);
             color: var(--text-dark);
         }
-
         .property-panel .close-btn {
             position: absolute;
             top: 10px;
-            left: 10px;
+            right: 10px;
             background: none;
             border: none;
             color: var(--text-dark);
             font-size: 1.8em;
-            padding: 8px;
+            padding: 5px;
             border-radius: 50%;
             transition: background-color 0.2s;
         }
@@ -336,7 +312,7 @@
         }
 
 
-        /* Fullscreen Overlay for Modals/Popups (e.g., Image Upload, Templates, Font Selection, Color Picker) */
+        /* Modals (Image Cropper, Templates, Font, Color Pickers, Layers, Add/Edit Text) */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -391,7 +367,7 @@
             background-color: var(--bg-light);
         }
 
-        /* Image Upload/Crop Modal specific styles */
+        /* Image Cropper Modal specific styles */
         #imageCropperModal .modal-body {
             display: flex;
             flex-direction: column;
@@ -461,7 +437,7 @@
             display: none;
         }
 
-        /* Template Modal specific styles */
+        /* Template/Font/Color Picker Modal specific styles */
         .template-grid, .font-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Responsive grid */
@@ -540,41 +516,190 @@
             background: none;
             cursor: pointer;
         }
+
+        /* Layers Panel Modal */
+        #layersPanelModal .modal-content {
+            max-width: 95vw; /* Wider to accommodate lock buttons */
+            max-height: 80vh;
+        }
+        #layersPanelModal .layer-list {
+            display: flex;
+            flex-direction: column-reverse; /* Display top layer at top of list */
+            gap: 10px;
+            margin-top: 15px;
+            max-height: 60vh;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        #layersPanelModal .layer-item {
+            display: flex;
+            align-items: center;
+            background-color: var(--bg-light);
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+            box-shadow: var(--shadow-soft);
+        }
+        #layersPanelModal .layer-item:hover {
+            background-color: #e0e0e0;
+            border-color: var(--primary-color);
+        }
+        #layersPanelModal .layer-item.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.3);
+            background-color: #f0f0f0;
+        }
+        #layersPanelModal .layer-item .layer-icon {
+            font-size: 1.2em;
+            margin-right: 10px;
+            color: var(--secondary-color);
+        }
+        #layersPanelModal .layer-item .layer-name {
+            flex-grow: 1;
+            font-weight: 600;
+            color: var(--text-dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        #layersPanelModal .layer-item .layer-lock-btn {
+            background: none;
+            border: none;
+            font-size: 1.2em;
+            color: var(--text-dark);
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: color 0.2s, background-color 0.2s;
+        }
+        #layersPanelModal .layer-item .layer-lock-btn:hover {
+            background-color: #ccc;
+        }
+        #layersPanelModal .layer-item .layer-lock-btn.locked {
+            color: var(--primary-color);
+        }
+        /* Style for partial text coloring example */
+        .partial-text-example {
+            font-size: 1.2em;
+            text-align: center;
+            margin-top: 15px;
+            color: #555;
+        }
+
+        /* Add/Edit Text Modal */
+        #addTextModal h3 {
+            font-family: 'Poppins', sans-serif;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        #addTextModal textarea {
+            width: calc(100% - 20px);
+            height: 100px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 1em;
+            resize: vertical;
+        }
+        #addTextModal .modal-buttons button {
+            flex-grow: 1;
+            background-color: var(--accent-color);
+            color: var(--text-light);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        #addTextModal .modal-buttons button.cancel {
+            background-color: #b0bec5;
+            color: var(--text-dark);
+        }
+        #addTextModal .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* Lock Icon next to zoom controls */
+        .lock-icon-area {
+            position: absolute;
+            top: 15px;
+            left: 15px; /* Moved to left side to avoid zoom controls */
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            background-color: rgba(33, 33, 33, 0.8);
+            border-radius: var(--border-radius);
+            padding: 5px;
+            box-shadow: var(--shadow-soft);
+            z-index: 20;
+        }
+        .lock-icon-area button {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.1em;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .lock-icon-area button:hover, .lock-icon-area button:active {
+            background-color: var(--primary-color);
+        }
+        .lock-icon-area button.locked {
+            color: var(--primary-color);
+        }
+
+
     </style>
 </head>
 <body>
     <div class="app-container">
-        <div class="sidebar left">
-            <button id="addTextBtn" title="Add Text"><i class="fas fa-font"></i></button>
-            <button id="openTextColorModalBtn" title="Text Color"><i class="fas fa-palette"></i></button>
-            <button id="openFontModalBtn" title="Text Font"><i class="fas fa-text-height"></i></button>
-            <button id="addShapeBtn" title="Add Shape"><i class="fas fa-shapes"></i></button>
-            <button id="addOverlayImageBtn" title="Add Overlay Image"><i class="fas fa-images"></i></button> <button id="setBgImageBtn" title="Set Background Image"><i class="fas fa-image-polaroid"></i></button> <button id="setBgColorBtn" title="Background Color"><i class="fas fa-fill-drip"></i></button>
-            <button id="loadTemplateBtn" title="Load Template"><i class="fas fa-layer-group"></i></button>
-            <button id="canvasSizeBtn" title="Canvas Size"><i class="fas fa-expand-arrows-alt"></i></button>
+        <div class="top-menu-bar">
+            <button id="downloadBtn" title="Download Thumbnail"><i class="fas fa-download"></i> Download</button>
+            <button id="clearCanvasBtn" title="Clear Canvas"><i class="fas fa-eraser"></i> Clear</button>
+            <button id="undoBtn" title="Undo" disabled><i class="fas fa-undo"></i> Undo</button>
+            <button id="redoBtn" title="Redo" disabled><i class="fas fa-redo"></i> Redo</button>
         </div>
 
         <div class="canvas-area">
             <div class="canvas-wrapper">
                 <canvas id="thumbnailCanvas"></canvas>
             </div>
-            <div class="floating-controls">
-                <button id="undoBtn" title="Undo" disabled><i class="fas fa-undo"></i></button>
-                <button id="redoBtn" title="Redo" disabled><i class="fas fa-redo"></i></button>
-                <button id="bringForwardBtn" title="Bring Forward"><i class="fas fa-arrow-up"></i></button>
-                <button id="sendBackwardBtn" title="Send Backward"><i class="fas fa-arrow-down"></i></button>
-            </div>
             <div class="zoom-controls">
                 <button id="zoomInBtn" title="Zoom In"><i class="fas fa-search-plus"></i></button>
                 <button id="zoomOutBtn" title="Zoom Out"><i class="fas fa-search-minus"></i></button>
                 <button id="resetZoomBtn" title="Reset Zoom"><i class="fas fa-compress"></i></button>
             </div>
+            <div class="lock-icon-area">
+                <button id="globalLockUnlockBtn" title="Lock/Unlock Selected"><i class="fas fa-lock"></i></button>
+            </div>
         </div>
 
-        <div class="sidebar right">
+        <div class="bottom-toolbar">
+            <button id="addTextBtn" title="Add Text"><i class="fas fa-font"></i></button>
+            <button id="editTextBtn" title="Edit Text" style="display:none;"><i class="fas fa-edit"></i></button> <button id="openTextColorModalBtn" title="Text Color"><i class="fas fa-palette"></i></button>
+            <button id="openFontModalBtn" title="Text Font"><i class="fas fa-text-height"></i></button>
+            <button id="addShapeBtn" title="Add Shape"><i class="fas fa-shapes"></i></button>
+            <button id="addOverlayImageBtn" title="Add Overlay Image"><i class="fas fa-images"></i></button>
+            <button id="setBgImageBtn" title="Set Background Image"><i class="fas fa-image-polaroid"></i></button>
+            <button id="setBgColorBtn" title="Background Color"><i class="fas fa-fill-drip"></i></button>
+            <button id="openColorAdjustmentsBtn" title="Color Adjustments"><i class="fas fa-paint-brush"></i></button>
+            <button id="loadTemplateBtn" title="Load Template"><i class="fas fa-layer-group"></i></button>
+            <button id="canvasSizeBtn" title="Canvas Size"><i class="fas fa-expand-arrows-alt"></i></button>
+            <button id="openLayersPanelBtn" title="Layers"><i class="fas fa-list-alt"></i></button>
             <button id="deleteObjectBtn" title="Delete Selected"><i class="fas fa-trash-alt"></i></button>
-            <button id="clearCanvasBtn" title="Clear Canvas"><i class="fas fa-eraser"></i></button>
-            <button id="downloadBtn" title="Download Thumbnail"><i class="fas fa-download"></i></button>
         </div>
 
         <div id="propertyPanel" class="property-panel">
@@ -584,7 +709,9 @@
             <div class="property-group">
                 <h4>Common Settings</h4>
                 <div class="button-row">
-                    <button id="lockObjectBtn"><i class="fas fa-lock"></i> Lock Object</button> </div>
+                    <button id="bringForwardBtn" title="Bring Forward"><i class="fas fa-arrow-up"></i> Bring Forward</button>
+                    <button id="sendBackwardBtn" title="Send Backward"><i class="fas fa-arrow-down"></i> Send Backward</button>
+                </div>
             </div>
 
             <div id="textProperties" style="display:none;" class="property-group">
@@ -600,6 +727,36 @@
                     <button id="italicBtn" title="Italic"><i class="fas fa-italic"></i></button>
                     <button id="underlineBtn" title="Underline"><i class="fas fa-underline"></i></button>
                 </div>
+
+                <div class="property-group">
+                    <h4>Text Stroke</h4>
+                    <label for="textStrokeColor">Color:</label>
+                    <input type="color" id="textStrokeColor" value="#000000">
+                    <label for="textStrokeWidth">Width:</label>
+                    <input type="number" id="textStrokeWidth" min="0" value="0">
+                </div>
+
+                <div class="property-group">
+                    <h4>Text Shadow</h4>
+                    <label for="textShadowColor">Color:</label>
+                    <input type="color" id="textShadowColor" value="#000000">
+                    <label for="textShadowBlur">Blur:</label>
+                    <input type="number" id="textShadowBlur" min="0" value="0">
+                    <label for="textShadowOffsetX">Offset X:</label>
+                    <input type="number" id="textShadowOffsetX" value="0">
+                    <label for="textShadowOffsetY">Offset Y:</label>
+                    <input type="number" id="textShadowOffsetY" value="0">
+                </div>
+
+                <div class="property-group">
+                    <h4>Text Background</h4>
+                    <label for="textBgColor">Color:</label>
+                    <input type="color" id="textBgColor" value="#ffffff">
+                    <label for="textBgOpacity">Opacity:</label>
+                    <input type="range" id="textBgOpacity" min="0" max="1" step="0.01" value="0">
+                    <label for="textBgRadius">Roundness:</label>
+                    <input type="number" id="textBgRadius" min="0" value="0">
+                </div>
             </div>
 
             <div id="imageProperties" style="display:none;" class="property-group">
@@ -607,7 +764,8 @@
                 <label for="panelOpacity">Opacity:</label>
                 <input type="range" id="panelOpacity" min="0" max="1" step="0.01" value="1">
                 <div class="button-row">
-                    <button onclick="showCropperModal(true, 're-crop')"><i class="fas fa-crop"></i> Re-crop Image</button>
+                    <button id="imageRecropBtn" onclick="showCropperModal(true, 're-crop')"><i class="fas fa-crop"></i> Re-crop Image</button>
+                    <button id="toggleImageRoundnessBtn" onclick="toggleImageRoundness()"><i class="fas fa-circle"></i> Make Round</button>
                     <button onclick="applyColorOverlayModal()"><i class="fas fa-tint"></i> Apply Color Overlay</button>
                 </div>
                 <div id="colorAdjustments" class="property-group">
@@ -667,7 +825,8 @@
             </div>
         </div>
 
-        <div id="imageCropperModal" class="modal-overlay"> <div class="modal-content">
+        <div id="imageCropperModal" class="modal-overlay">
+            <div class="modal-content">
                 <button class="close-btn" onclick="hideModal('imageCropperModal')"><i class="fas fa-times"></i></button>
                 <h3>Upload & Crop Image</h3>
                 <div class="modal-body">
@@ -779,6 +938,7 @@
             <div class="modal-content">
                 <button class="close-btn" onclick="hideModal('textColorPickerModal')"><i class="fas fa-times"></i></button>
                 <h3>Select Text Color</h3>
+                <p class="partial-text-example">ডাবল ক্লিক করে টেক্সট এডিট মোডে যান এবং রঙ পরিবর্তন করতে টেক্সট সিলেক্ট করুন।</p>
                 <input type="color" id="modalTextColorInput" value="#000000">
                 <div class="color-options">
                     <div class="color-option-box" style="background-color: #000000;" data-color="#000000"></div>
@@ -826,6 +986,15 @@
             </div>
         </div>
 
+        <div id="layersPanelModal" class="modal-overlay">
+            <div class="modal-content">
+                <button class="close-btn" onclick="hideModal('layersPanelModal')"><i class="fas fa-times"></i></button>
+                <h3>Layers</h3>
+                <div id="layerList" class="layer-list">
+                    </div>
+            </div>
+        </div>
+
 
     </div>
 
@@ -849,11 +1018,18 @@
                 isRedoing = false;
                 history = history.slice(0, historyPointer + 1);
             }
-            // Include custom properties in JSON export for locking
-            const json = JSON.stringify(canvas.toJSON(['lockMovementX', 'lockMovementY', 'lockRotation', 'lockScalingX', 'lockScalingY', 'lockSkewingX', 'lockSkewingY', 'selectable', 'evented', 'hasControls', 'overlayColor', 'overlayOpacity']));
+            // Include custom properties for locking, image overlays, stroke, shadow, background for text
+            const json = JSON.stringify(canvas.toJSON([
+                'lockMovementX', 'lockMovementY', 'lockRotation', 'lockScalingX', 'lockScalingY',
+                'lockSkewingX', 'lockSkewingY', 'selectable', 'evented', 'hasControls',
+                'overlayColor', 'overlayOpacity', 'compositeOperation', 'clipPath', // For round images
+                'stroke', 'strokeWidth', 'shadow', 'backgroundColor', 'textBackgroundColor', 'textBackgroundRadius', // For text styles
+                'fill' // Ensure fill is included for partial text styling
+            ]));
             history.push(json);
             historyPointer = history.length - 1;
             updateUndoRedoButtons();
+            updateLayersPanel(); // Update layers panel whenever canvas state changes
         }
 
         function undo() {
@@ -863,17 +1039,61 @@
                 canvas.loadFromJSON(history[historyPointer], function() {
                     canvas.renderAll();
                     updateUndoRedoButtons();
-                    hidePropertyPanel(); /* Hide panel on undo/redo */
-                    // Reapply filters after loading from JSON, as Fabric.js might not do it automatically for all filters
+                    hidePropertyPanel();
+                    // Reapply filters and custom properties after loading from JSON
                     canvas.getObjects().forEach(obj => {
                         if (obj.type === 'image' && obj.filters && obj.filters.length > 0) {
                             obj.applyFilters();
                         }
+                        // Reapply overlay colors (for images)
+                        if (obj.type === 'image' && obj.overlayColor && obj.overlayOpacity !== undefined) { // Check for overlay data
+                            obj.set({
+                                fill: obj.overlayColor,
+                                opacity: obj.overlayOpacity,
+                                compositeOperation: obj.compositeOperation || 'source-over'
+                            });
+                        }
+                        // Reapply text background color, stroke, shadow
+                        if (obj.type === 'i-text') {
+                            obj.set({
+                                backgroundColor: obj.backgroundColor,
+                                shadow: obj.shadow,
+                                stroke: obj.stroke,
+                                strokeWidth: obj.strokeWidth,
+                                textBackgroundColor: obj.textBackgroundColor, // Ensure text background properties are set
+                                textBackgroundRadius: obj.textBackgroundRadius, // For round text background
+                                fill: obj.fill // Ensure partial fills are applied
+                            });
+                        }
+                        // Set lock state correctly
+                        obj.set({
+                            selectable: obj.selectable,
+                            evented: obj.evented,
+                            hasControls: obj.hasControls,
+                            lockMovementX: obj.lockMovementX,
+                            lockMovementY: obj.lockMovementY,
+                            lockRotation: obj.lockRotation,
+                            lockScalingX: obj.lockScalingX,
+                            lockScalingY: obj.lockScalingY,
+                            lockSkewingX: obj.lockSkewingX,
+                            lockSkewingY: obj.lockSkewingY
+                        });
                     });
-                    if (canvas.backgroundImage && canvas.backgroundImage.filters && canvas.backgroundImage.filters.length > 0) {
-                        canvas.backgroundImage.applyFilters();
+                    if (canvas.backgroundImage) {
+                        if (canvas.backgroundImage.filters && canvas.backgroundImage.filters.length > 0) {
+                            canvas.backgroundImage.applyFilters();
+                        }
+                        // Apply overlay/compositing to background if it has it (less common for background)
+                        if (canvas.backgroundImage.overlayColor && canvas.backgroundImage.overlayOpacity !== undefined) {
+                            canvas.backgroundImage.set({
+                                fill: canvas.backgroundImage.overlayColor,
+                                opacity: canvas.backgroundImage.overlayOpacity,
+                                compositeOperation: canvas.backgroundImage.compositeOperation || 'source-over'
+                            });
+                        }
                     }
                     canvas.renderAll();
+                    updateLayersPanel(); // Update layers panel after undo/redo
                 });
             }
         }
@@ -885,17 +1105,57 @@
                 canvas.loadFromJSON(history[historyPointer], function() {
                     canvas.renderAll();
                     updateUndoRedoButtons();
-                    hidePropertyPanel(); /* Hide panel on undo/redo */
-                    // Reapply filters after loading from JSON
-                     canvas.getObjects().forEach(obj => {
+                    hidePropertyPanel();
+                    // Reapply filters and custom properties after loading from JSON
+                    canvas.getObjects().forEach(obj => {
                         if (obj.type === 'image' && obj.filters && obj.filters.length > 0) {
                             obj.applyFilters();
                         }
+                        if (obj.type === 'image' && obj.overlayColor && obj.overlayOpacity !== undefined) {
+                            obj.set({
+                                fill: obj.overlayColor,
+                                opacity: obj.overlayOpacity,
+                                compositeOperation: obj.compositeOperation || 'source-over'
+                            });
+                        }
+                        if (obj.type === 'i-text') {
+                            obj.set({
+                                backgroundColor: obj.backgroundColor,
+                                shadow: obj.shadow,
+                                stroke: obj.stroke,
+                                strokeWidth: obj.strokeWidth,
+                                textBackgroundColor: obj.textBackgroundColor,
+                                textBackgroundRadius: obj.textBackgroundRadius,
+                                fill: obj.fill
+                            });
+                        }
+                        obj.set({
+                            selectable: obj.selectable,
+                            evented: obj.evented,
+                            hasControls: obj.hasControls,
+                            lockMovementX: obj.lockMovementX,
+                            lockMovementY: obj.lockMovementY,
+                            lockRotation: obj.lockRotation,
+                            lockScalingX: obj.lockScalingX,
+                            lockScalingY: obj.lockScalingY,
+                            lockSkewingX: obj.lockSkewingX,
+                            lockSkewingY: obj.lockSkewingY
+                        });
                     });
-                    if (canvas.backgroundImage && canvas.backgroundImage.filters && canvas.backgroundImage.filters.length > 0) {
-                        canvas.backgroundImage.applyFilters();
+                    if (canvas.backgroundImage) {
+                        if (canvas.backgroundImage.filters && canvas.backgroundImage.filters.length > 0) {
+                            canvas.backgroundImage.applyFilters();
+                        }
+                        if (canvas.backgroundImage.overlayColor && canvas.backgroundImage.overlayOpacity !== undefined) {
+                            canvas.backgroundImage.set({
+                                fill: canvas.backgroundImage.overlayColor,
+                                opacity: canvas.backgroundImage.overlayOpacity,
+                                compositeOperation: canvas.backgroundImage.compositeOperation || 'source-over'
+                            });
+                        }
                     }
                     canvas.renderAll();
+                    updateLayersPanel(); // Update layers panel after undo/redo
                 });
             }
         }
@@ -907,13 +1167,23 @@
 
         // Initialize history with initial canvas state
         saveCanvasState();
-        // Save state on specific canvas events for undo/redo
         canvas.on('object:modified', saveCanvasState);
         canvas.on('object:added', saveCanvasState);
         canvas.on('object:removed', saveCanvasState);
-        // Note: For complex interactions like dragging/resizing, `modified` covers the final state.
-        // For continuous changes (e.g., color slider), use `change` event on input.
-        canvas.on('selection:cleared', saveCanvasState); // Save when selection cleared (e.g., locking)
+        canvas.on('selection:cleared', saveCanvasState);
+        canvas.on('text:selection:changed', function(options) {
+            const activeObject = canvas.getActiveObject();
+            if (activeObject && activeObject.type === 'i-text') {
+                if (activeObject.selectionStart !== activeObject.selectionEnd) {
+                    const selectedStyles = activeObject.getSelectionStyles();
+                    const firstColor = selectedStyles[0]?.fill;
+                    const allSameColor = selectedStyles.every(style => style.fill === firstColor);
+                    document.getElementById('modalTextColorInput').value = allSameColor ? firstColor : '#000000';
+                } else {
+                    document.getElementById('modalTextColorInput').value = activeObject.fill;
+                }
+            }
+        });
 
 
         // --- UI Control & Modal Functions ---
@@ -923,7 +1193,6 @@
 
         function hideModal(modalId) {
             document.getElementById(modalId).classList.remove('active');
-            // Reset image preview/cropper on close
             if (modalId === 'imageCropperModal') {
                 if (cropper) {
                     cropper.destroy();
@@ -936,21 +1205,14 @@
 
         function showPropertyPanel(type) {
             document.getElementById('propertyPanel').classList.add('active');
-            // Hide all property groups first
             document.getElementById('textProperties').style.display = 'none';
             document.getElementById('imageProperties').style.display = 'none';
             document.getElementById('shapeProperties').style.display = 'none';
             document.getElementById('bgColorProperties').style.display = 'none';
             document.getElementById('canvasSizeProperties').style.display = 'none';
             
-            // Common properties - Lock Object
             const activeObject = canvas.getActiveObject();
-            if (activeObject) {
-                updateLockObjectButton(!activeObject.selectable);
-            } else {
-                 updateLockObjectButton(false); // Reset to "Lock Object" when nothing is selected
-            }
-
+            // Lock/Unlock button is now handled by the globalLockUnlockBtn and layers panel
 
             if (type === 'text') {
                 document.getElementById('textProperties').style.display = 'block';
@@ -960,14 +1222,28 @@
                     document.getElementById('boldBtn').classList.toggle('active', activeObject.fontWeight === 'bold');
                     document.getElementById('italicBtn').classList.toggle('active', activeObject.fontStyle === 'italic');
                     document.getElementById('underlineBtn').classList.toggle('active', activeObject.underline);
+                    
+                    // Populate text stroke
+                    document.getElementById('textStrokeColor').value = activeObject.stroke || '#000000';
+                    document.getElementById('textStrokeWidth').value = activeObject.strokeWidth || 0;
+
+                    // Populate text shadow
+                    const shadow = activeObject.shadow || {color: '#000000', blur: 0, offsetX: 0, offsetY: 0};
+                    document.getElementById('textShadowColor').value = shadow.color;
+                    document.getElementById('textShadowBlur').value = shadow.blur;
+                    document.getElementById('textShadowOffsetX').value = shadow.offsetX;
+                    document.getElementById('textShadowOffsetY').value = shadow.offsetY;
+
+                    // Populate text background
+                    document.getElementById('textBgColor').value = activeObject.backgroundColor || '#ffffff';
+                    document.getElementById('textBgOpacity').value = activeObject.backgroundColor ? (new fabric.Color(activeObject.backgroundColor).getAlpha()) : 0;
+                    document.getElementById('textBgRadius').value = activeObject.textBackgroundRadius || 0;
                 }
             } else if (type === 'image') {
                 document.getElementById('imageProperties').style.display = 'block';
-                document.getElementById('colorAdjustments').style.display = 'block'; // Show color adjustments for images
+                document.getElementById('colorAdjustments').style.display = 'block';
                 if (activeObject && activeObject.type === 'image') {
                     document.getElementById('panelOpacity').value = activeObject.opacity;
-                    // Populate color adjustments
-                    // Filter order: Brightness, Contrast, Saturation, Hue
                     const filters = activeObject.filters || [];
                     document.getElementById('brightnessRange').value = filters[0] && filters[0].type === 'Brightness' ? (filters[0].brightness * 100) + 100 : 100;
                     document.getElementById('contrastRange').value = filters[1] && filters[1].type === 'Contrast' ? (filters[1].contrast * 100) + 100 : 100;
@@ -989,6 +1265,24 @@
                 document.getElementById('canvasSizeProperties').style.display = 'block';
                 document.getElementById('canvasWidthInput').value = canvas.width;
                 document.getElementById('canvasHeightInput').value = canvas.height;
+            } else if (type === 'color_adjustments_direct') {
+                document.getElementById('imageProperties').style.display = 'block'; // Ensure image properties are visible for context
+                document.getElementById('colorAdjustments').style.display = 'block';
+
+                const targetObjectForColorAdjust = canvas.getActiveObject() || canvas.backgroundImage;
+                if (targetObjectForColorAdjust && targetObjectForColorAdjust.type === 'image') {
+                    const filters = targetObjectForColorAdjust.filters || [];
+                    document.getElementById('brightnessRange').value = filters[0] && filters[0].type === 'Brightness' ? (filters[0].brightness * 100) + 100 : 100;
+                    document.getElementById('contrastRange').value = filters[1] && filters[1].type === 'Contrast' ? (filters[1].contrast * 100) + 100 : 100;
+                    document.getElementById('saturationRange').value = filters[2] && filters[2].type === 'Saturation' ? (filters[2].saturation * 100) + 100 : 100;
+                    document.getElementById('hueRange').value = filters[3] && filters[3].type === 'HueRotation' ? (filters[3].rotation * 360 / (2 * Math.PI)) : 0;
+                } else {
+                    // If no image or background image, reset sliders
+                    document.getElementById('brightnessRange').value = 100;
+                    document.getElementById('contrastRange').value = 100;
+                    document.getElementById('saturationRange').value = 100;
+                    document.getElementById('hueRange').value = 0;
+                }
             }
         }
 
@@ -997,13 +1291,42 @@
         }
 
         // --- Core Fabric.js & Canvas Manipulation Functions ---
-        function addText() {
-            const text = new fabric.IText('আপনার টেক্সট এখানে', {
+        // Function to add or edit text based on current mode
+        let currentEditingTextObject = null; // Store reference to the text object being edited
+
+        function openAddTextModal() {
+            document.getElementById('addTextModal').classList.add('active');
+            document.getElementById('textInputArea').value = '';
+            document.getElementById('confirmAddUpdateTextBtn').textContent = 'Add Text';
+            document.getElementById('confirmAddUpdateTextBtn').onclick = addTextToCanvas;
+            currentEditingTextObject = null;
+        }
+
+        function openEditTextModal() {
+            const activeObject = canvas.getActiveObject();
+            if (activeObject && activeObject.type === 'i-text') {
+                currentEditingTextObject = activeObject;
+                document.getElementById('addTextModal').classList.add('active');
+                document.getElementById('textInputArea').value = activeObject.text;
+                document.getElementById('confirmAddUpdateTextBtn').textContent = 'Update Text';
+                document.getElementById('confirmAddUpdateTextBtn').onclick = updateTextOnCanvas;
+            } else {
+                alert('এডিট করতে অনুগ্রহ করে একটি টেক্সট নির্বাচন করুন!');
+            }
+        }
+
+        function addTextToCanvas() {
+            const textValue = document.getElementById('textInputArea').value;
+            if (textValue.trim() === '') {
+                alert('অনুগ্রহ করে কিছু টেক্সট টাইপ করুন!');
+                return;
+            }
+            const text = new fabric.IText(textValue, {
                 left: canvas.width / 2,
                 top: canvas.height / 2,
                 fontSize: 50,
                 fill: '#000000',
-                fontFamily: 'Noto Serif Bengali', /* Default Bangla font */
+                fontFamily: 'Noto Serif Bengali',
                 fontWeight: '700',
                 originX: 'center',
                 originY: 'center',
@@ -1012,7 +1335,20 @@
             canvas.add(text);
             canvas.setActiveObject(text);
             canvas.renderAll();
+            saveCanvasState();
+            hideModal('addTextModal');
         }
+
+        function updateTextOnCanvas() {
+            if (currentEditingTextObject) {
+                currentEditingTextObject.set({ text: document.getElementById('textInputArea').value });
+                canvas.renderAll();
+                saveCanvasState();
+            }
+            hideModal('addTextModal');
+            currentEditingTextObject = null;
+        }
+
 
         function addShape(shapeType) {
             let shape;
@@ -1106,7 +1442,8 @@
                                 filters: activeObject.filters || [], // Keep existing filters
                                 overlayColor: activeObject.overlayColor, // Keep overlay color
                                 overlayOpacity: activeObject.overlayOpacity, // Keep overlay opacity
-                                compositeOperation: activeObject.compositeOperation // Keep composite operation
+                                compositeOperation: activeObject.compositeOperation, // Keep composite operation
+                                clipPath: activeObject.clipPath // Keep clipPath for roundness
                             });
                             activeObject.applyFilters(); // Reapply filters
                             canvas.renderAll();
@@ -1168,8 +1505,6 @@
                 const activeObject = canvas.getActiveObject();
                 if (activeObject && activeObject.type === 'image') {
                     const imgElement = document.getElementById('imageToCrop');
-                    // To get the original image data for re-cropping, it's best to store it or extract from filter
-                    // For simplicity, we convert canvas object to dataURL, but filters will be baked in
                     imgElement.src = activeObject.toDataURL({ format: 'png', quality: 1.0 }); 
                     
                     if (cropper) cropper.destroy();
@@ -1190,101 +1525,127 @@
             }
         }
 
-        // --- Object Locking ---
-        function toggleLockObject() {
+        // --- Object Roundness (Clipping) ---
+        function toggleImageRoundness() {
             const activeObject = canvas.getActiveObject();
-            if (activeObject) {
-                // Toggle selectable state
-                const newSelectableState = !activeObject.selectable;
-
-                activeObject.set({
-                    selectable: newSelectableState,
-                    evented: newSelectableState, // Respond to events only if selectable
-                    hasControls: newSelectableState, // Show controls only if selectable
-                    lockMovementX: !newSelectableState,
-                    lockMovementY: !newSelectableState,
-                    lockRotation: !newSelectableState,
-                    lockScalingX: !newSelectableState,
-                    lockScalingY: !newSelectableState,
-                    // Note: Skewing locks are typically tied to scaling locks or `hasControls` implicitly
-                    // Explicitly set them if needed for granular control
-                    lockSkewingX: !newSelectableState,
-                    lockSkewingY: !newSelectableState
-                });
-
-                // If object becomes unselectable, discard active selection
-                if (!newSelectableState) {
-                    canvas.discardActiveObject();
+            if (activeObject && activeObject.type === 'image') {
+                if (activeObject.clipPath) {
+                    activeObject.clipPath = null; // Remove clipping
                 } else {
-                    // If object becomes selectable, re-select it to show controls
-                    canvas.setActiveObject(activeObject);
+                    const radius = Math.min(activeObject.width, activeObject.height) / 2;
+                    activeObject.set({
+                        clipPath: new fabric.Circle({
+                            radius: radius,
+                            originX: 'center',
+                            originY: 'center',
+                            absolutePositioned: true
+                        })
+                    });
                 }
-                
                 canvas.renderAll();
                 saveCanvasState();
-                updateLockObjectButton(newSelectableState); // Update button based on the *new* selectable state
             } else {
-                alert('লক/আনলক করার জন্য অনুগ্রহ করে একটি অবজেক্ট নির্বাচন করুন!');
+                alert('বৃত্তাকার করতে অনুগ্রহ করে একটি ছবি নির্বাচন করুন!');
             }
         }
 
-        function updateLockObjectButton(isSelectable) { // Parameter is now `isSelectable`
-            const lockBtn = document.getElementById('lockObjectBtn');
-            if (isSelectable) { // If currently selectable, button should say "Lock"
-                lockBtn.innerHTML = '<i class="fas fa-lock"></i> Lock Object';
-                lockBtn.classList.remove('active');
-            } else { // If currently not selectable (locked), button should say "Unlock"
-                lockBtn.innerHTML = '<i class="fas fa-lock-open"></i> Unlock Object';
-                lockBtn.classList.add('active');
+        // --- Object Locking (handled via Layers Panel and Global Button) ---
+        function toggleLockObjectFromGlobalButton() {
+            const activeObject = canvas.getActiveObject();
+            if (activeObject) {
+                toggleLockObjectFromLayer(activeObject); // Re-use the layer locking logic
+            } else {
+                alert('লক/আনলক করতে অনুগ্রহ করে একটি অবজেক্ট নির্বাচন করুন!');
+            }
+        }
+
+        function toggleLockObjectFromLayer(obj) {
+            const newSelectableState = !obj.selectable;
+
+            obj.set({
+                selectable: newSelectableState,
+                evented: newSelectableState, // Respond to events only if selectable
+                hasControls: newSelectableState, // Show controls only if selectable
+                lockMovementX: !newSelectableState,
+                lockMovementY: !newSelectableState,
+                lockRotation: !newSelectableState,
+                lockScalingX: !newSelectableState,
+                lockScalingY: !newSelectableState,
+                lockSkewingX: !newSelectableState,
+                lockSkewingY: !newSelectableState
+            });
+
+            if (!newSelectableState) {
+                canvas.discardActiveObject(); // Deselect if object is being locked
+            } else {
+                canvas.setActiveObject(obj); // Select if object is being unlocked
+            }
+            
+            canvas.renderAll();
+            saveCanvasState();
+            updateLayersPanel(); // Update layers panel to reflect lock state
+            updateGlobalLockButton(); // Update global lock button state
+        }
+
+        function updateGlobalLockButton() {
+            const globalLockBtn = document.getElementById('globalLockUnlockBtn');
+            const activeObject = canvas.getActiveObject();
+
+            if (activeObject && !activeObject.selectable) {
+                globalLockBtn.innerHTML = '<i class="fas fa-lock-open"></i>';
+                globalLockBtn.classList.add('locked');
+            } else {
+                globalLockBtn.innerHTML = '<i class="fas fa-lock"></i>';
+                globalLockBtn.classList.remove('locked');
             }
         }
 
         // --- Color Grading / Image Filters ---
         function applyImageFilters() {
             const activeObject = canvas.getActiveObject();
-            // Check for both active object and active background image
-            let targetObject = null;
+            let targetObject = null; // The object to apply filters to
+
             if (activeObject && activeObject.type === 'image') {
                 targetObject = activeObject;
             } else if (canvas.backgroundImage && canvas.backgroundImage.type === 'image') {
-                // If background is an image and no active object is selected, apply to background
-                // This logic is simplified; a more robust app might explicitly differentiate.
                 targetObject = canvas.backgroundImage;
+            } else {
+                // If no image is selected and no background image, reset sliders
+                document.getElementById('brightnessRange').value = 100;
+                document.getElementById('contrastRange').value = 100;
+                document.getElementById('saturationRange').value = 100;
+                document.getElementById('hueRange').value = 0;
+                return; // Exit if no target object
             }
 
-            if (targetObject) {
-                const brightness = (parseFloat(document.getElementById('brightnessRange').value) - 100) / 100;
-                const contrast = (parseFloat(document.getElementById('contrastRange').value) - 100) / 100;
-                const saturation = (parseFloat(document.getElementById('saturationRange').value) - 100) / 100;
-                const hue = (parseFloat(document.getElementById('hueRange').value) * Math.PI * 2) / 360; // Convert degrees to radians
+            const brightness = (parseFloat(document.getElementById('brightnessRange').value) - 100) / 100;
+            const contrast = (parseFloat(document.getElementById('contrastRange').value) - 100) / 100;
+            const saturation = (parseFloat(document.getElementById('saturationRange').value) - 100) / 100;
+            const hue = (parseFloat(document.getElementById('hueRange').value) * Math.PI * 2) / 360; // Convert degrees to radians
 
-                targetObject.filters = targetObject.filters || [];
+            targetObject.filters = targetObject.filters || [];
 
-                // Fabric.js filters: Brightness, Contrast, Saturation, HueRotation
-                // Ensure correct filter types are at expected indices or add new ones
-                const updateFilter = (filterType, index, options) => {
-                    if (targetObject.filters[index] && targetObject.filters[index].type === filterType) {
-                        Object.assign(targetObject.filters[index], options);
-                    } else {
-                        switch (filterType) {
-                            case 'Brightness': targetObject.filters[index] = new fabric.Image.filters.Brightness(options); break;
-                            case 'Contrast': targetObject.filters[index] = new fabric.Image.filters.Contrast(options); break;
-                            case 'Saturation': targetObject.filters[index] = new fabric.Image.filters.Saturation(options); break;
-                            case 'HueRotation': targetObject.filters[index] = new fabric.Image.filters.HueRotation(options); break;
-                            // Add other filters as needed
-                        }
+            const updateFilter = (filterType, index, options) => {
+                if (targetObject.filters[index] && targetObject.filters[index].type === filterType) {
+                    Object.assign(targetObject.filters[index], options);
+                } else {
+                    switch (filterType) {
+                        case 'Brightness': targetObject.filters[index] = new fabric.Image.filters.Brightness(options); break;
+                        case 'Contrast': targetObject.filters[index] = new fabric.Image.filters.Contrast(options); break;
+                        case 'Saturation': targetObject.filters[index] = new fabric.Image.filters.Saturation(options); break;
+                        case 'HueRotation': targetObject.filters[index] = new fabric.Image.filters.HueRotation(options); break;
                     }
-                };
+                }
+            };
 
-                updateFilter('Brightness', 0, { brightness: brightness });
-                updateFilter('Contrast', 1, { contrast: contrast });
-                updateFilter('Saturation', 2, { saturation: saturation });
-                updateFilter('HueRotation', 3, { rotation: hue });
+            updateFilter('Brightness', 0, { brightness: brightness });
+            updateFilter('Contrast', 1, { contrast: contrast });
+            updateFilter('Saturation', 2, { saturation: saturation });
+            updateFilter('HueRotation', 3, { rotation: hue });
 
-                targetObject.applyFilters();
-                canvas.renderAll();
-                // saveCanvasState() is called on 'change' event of range inputs
-            }
+            targetObject.applyFilters();
+            canvas.renderAll();
+            // saveCanvasState() is called on 'change' event of range inputs
         }
 
 
@@ -1529,22 +1890,116 @@
             applyCanvasSize();
         }
 
+        /* --- Layers Panel Functions --- */
+        function updateLayersPanel() {
+            const layerListDiv = document.getElementById('layerList');
+            layerListDiv.innerHTML = ''; // Clear existing list
+
+            // Get all objects from canvas, including background image
+            let objects = canvas.getObjects().slice(); // Create a copy
+            if (canvas.backgroundImage) {
+                 // Fabric.js objects array doesn't include background. We add it manually.
+                 // We need a unique identifier. Let's use a custom property.
+                 const bgObj = Object.assign({}, canvas.backgroundImage); // Shallow copy
+                 bgObj.type = 'image'; // Ensure type is set for identification
+                 bgObj.name = 'Background Image'; // Give it a name for the panel
+                 bgObj._isBackground = true; // Custom flag
+                 // Background image doesn't have selectable/evented by default, simulate for UI
+                 bgObj.selectable = canvas.backgroundImage.selectable !== undefined ? canvas.backgroundImage.selectable : false; // Default to not selectable
+                 bgObj.evented = canvas.backgroundImage.evented !== undefined ? canvas.backgroundImage.evented : false;
+                 objects.unshift(bgObj); // Add to the beginning of the list
+            }
+
+            objects.forEach((obj, index) => {
+                const layerItem = document.createElement('div');
+                layerItem.className = 'layer-item';
+                // Highlight active object
+                if (canvas.getActiveObject() === obj) {
+                    layerItem.classList.add('active');
+                } else if (obj._isBackground && canvas.backgroundImage === canvas.getActiveObject()) { // If background is somehow active (e.g. from filter panel)
+                    // This case is unlikely with the current UI where background isn't activatable
+                }
+
+                let layerName = 'Unknown Object';
+                let layerIcon = 'fas fa-square'; // Default icon
+                if (obj.type === 'i-text') {
+                    layerName = obj.text.length > 20 ? obj.text.substring(0, 20) + '...' : obj.text || `Text Layer ${index}`;
+                    layerIcon = 'fas fa-font';
+                } else if (obj.type === 'image') {
+                    layerName = obj._isBackground ? 'Background Image' : `Image Layer ${index}`;
+                    layerIcon = 'fas fa-image';
+                } else if (obj.type === 'rect') {
+                    layerName = `Rectangle ${index}`;
+                    layerIcon = 'fas fa-square';
+                } else if (obj.type === 'circle') {
+                    layerName = `Circle ${index}`;
+                    layerIcon = 'fas fa-circle';
+                } else if (obj.type === 'triangle') {
+                    layerName = `Triangle ${index}`;
+                    layerIcon = 'fas fa-caret-up';
+                } else if (obj.type === 'group') {
+                    layerName = `Group ${index}`;
+                    layerIcon = 'fas fa-object-group';
+                }
+
+                const isLocked = !obj.selectable; // Check the actual selectable state
+                layerItem.innerHTML = `
+                    <i class="${layerIcon} layer-icon"></i>
+                    <span class="layer-name">${layerName}</span>
+                    <button class="layer-lock-btn ${isLocked ? 'locked' : ''}" title="${isLocked ? 'Unlock' : 'Lock'}">
+                        <i class="${isLocked ? 'fas fa-lock-open' : 'fas fa-lock'}"></i>
+                    </button>
+                `;
+
+                layerItem.addEventListener('click', (e) => {
+                    // Only select if not background image
+                    if (!obj._isBackground) {
+                        canvas.setActiveObject(obj);
+                        canvas.renderAll();
+                        hideModal('layersPanelModal'); // Close layers panel after selection
+                    } else {
+                         // If background is clicked, just close panel.
+                         hideModal('layersPanelModal');
+                    }
+                });
+
+                const lockButton = layerItem.querySelector('.layer-lock-btn');
+                lockButton.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent layer item click event from propagating to item selection
+                    if (obj._isBackground) {
+                        // For background image, you might implement custom locking logic if needed.
+                        // For now, it's not directly lockable via layer panel as it doesn't have selectable props.
+                        alert('ব্যাকগ্রাউন্ড ইমেজকে সরাসরি লেয়ার প্যানেল থেকে লক/আনলক করা যাবে না।');
+                    } else {
+                        toggleLockObjectFromLayer(obj);
+                    }
+                });
+
+                layerListDiv.appendChild(layerItem);
+            });
+            // showModal('layersPanelModal'); // Do not show modal automatically after update
+        }
+
 
         /* --- Event Listeners and Canvas Responsiveness --- */
         addInitialGuidingText(); /* Initial text */
 
-        /* IMPORTANT: Selection event listeners for property panel */
+        /* IMPORTANT: Selection event listeners for property panel and toolbar */
         canvas.on('selection:created', function(e) {
             if (e.target) { 
                 if (e.target.type === 'i-text') {
                     showPropertyPanel('text');
-                    document.getElementById('modalTextColorInput').value = e.target.fill;
-                } else if (e.target.type === 'image') {
+                    document.getElementById('modalTextColorInput').value = e.target.getSelectionStyles()[0]?.fill || e.target.fill || '#000000';
+                    document.getElementById('editTextBtn').style.display = 'block'; // Show Edit Text button
+                } else {
+                    document.getElementById('editTextBtn').style.display = 'none'; // Hide Edit Text button
+                }
+                if (e.target.type === 'image') {
                     showPropertyPanel('image');
                 } else if (e.target.type === 'rect' || e.target.type === 'circle' || e.target.type === 'triangle') {
                     showPropertyPanel('shape');
                 }
-                updateLockObjectButton(e.target.selectable); // Update lock button state based on current selectable state
+                updateGlobalLockButton(); // Update global lock button state
             }
         });
 
@@ -1552,19 +2007,24 @@
             if (e.target) {
                  if (e.target.type === 'i-text') {
                     showPropertyPanel('text');
-                    document.getElementById('modalTextColorInput').value = e.target.fill;
-                } else if (e.target.type === 'image') {
+                    document.getElementById('modalTextColorInput').value = e.target.getSelectionStyles()[0]?.fill || e.target.fill || '#000000';
+                    document.getElementById('editTextBtn').style.display = 'block';
+                } else {
+                    document.getElementById('editTextBtn').style.display = 'none';
+                }
+                if (e.target.type === 'image') {
                     showPropertyPanel('image');
                 } else if (e.target.type === 'rect' || e.target.type === 'circle' || e.target.type === 'triangle') {
                     showPropertyPanel('shape');
                 }
-                updateLockObjectButton(e.target.selectable);
+                updateGlobalLockButton();
             }
         });
 
         canvas.on('selection:cleared', function() {
             hidePropertyPanel();
-            updateLockObjectButton(true); // Reset lock button to "Lock Object" when no object is selected (assuming default is unlocked)
+            document.getElementById('editTextBtn').style.display = 'none'; // Hide Edit Text button
+            updateGlobalLockButton(); // Update global lock button state
         });
 
         /* --- Property Panel Input Listeners --- */
@@ -1590,7 +2050,12 @@
         document.getElementById('modalTextColorInput').addEventListener('input', function() {
             const activeObject = canvas.getActiveObject();
             if (activeObject && activeObject.type === 'i-text') {
-                activeObject.set({ fill: this.value });
+                // Apply to selection if active selection, else to whole text
+                if (activeObject.isEditing && activeObject.selectionStart !== activeObject.selectionEnd) {
+                    activeObject.setSelectionStyles({ fill: this.value });
+                } else {
+                    activeObject.set({ fill: this.value });
+                }
                 canvas.renderAll();
             }
         });
@@ -1601,7 +2066,11 @@
             const activeObject = canvas.getActiveObject();
             const selectedColor = document.getElementById('modalTextColorInput').value;
             if (activeObject && activeObject.type === 'i-text') {
-                activeObject.set({ fill: selectedColor });
+                 if (activeObject.isEditing && activeObject.selectionStart !== activeObject.selectionEnd) {
+                    activeObject.setSelectionStyles({ fill: selectedColor });
+                } else {
+                    activeObject.set({ fill: selectedColor });
+                }
                 canvas.renderAll();
                 saveCanvasState();
             }
@@ -1612,8 +2081,8 @@
         document.querySelectorAll('#textColorPickerModal .color-option-box').forEach(box => {
             box.addEventListener('click', function() {
                 const color = this.dataset.color;
-                document.getElementById('modalTextColorInput').value = color; /* Update color input */
-                applyTextColorFromModal(); /* Apply and close modal */
+                document.getElementById('modalTextColorInput').value = color;
+                applyTextColorFromModal();
             });
         });
 
@@ -1645,6 +2114,73 @@
                 saveCanvasState();
             }
         });
+
+        /* Text Stroke */
+        document.getElementById('textStrokeColor').addEventListener('input', function() {
+            const activeObject = canvas.getActiveObject();
+            if (activeObject && activeObject.type === 'i-text') {
+                activeObject.set({ stroke: this.value });
+                canvas.renderAll();
+            }
+        });
+        document.getElementById('textStrokeColor').addEventListener('change', saveCanvasState);
+
+        document.getElementById('textStrokeWidth').addEventListener('input', function() {
+            const activeObject = canvas.getActiveObject();
+            if (activeObject && activeObject.type === 'i-text') {
+                activeObject.set({ strokeWidth: parseInt(this.value) });
+                canvas.renderAll();
+            }
+        });
+        document.getElementById('textStrokeWidth').addEventListener('change', saveCanvasState);
+
+        /* Text Shadow */
+        function updateTextShadow() {
+            const activeObject = canvas.getActiveObject();
+            if (activeObject && activeObject.type === 'i-text') {
+                activeObject.set({
+                    shadow: new fabric.Shadow({
+                        color: document.getElementById('textShadowColor').value,
+                        blur: parseInt(document.getElementById('textShadowBlur').value),
+                        offsetX: parseInt(document.getElementById('textShadowOffsetX').value),
+                        offsetY: parseInt(document.getElementById('textShadowOffsetY').value)
+                    })
+                });
+                canvas.renderAll();
+            }
+        }
+        document.getElementById('textShadowColor').addEventListener('input', updateTextShadow);
+        document.getElementById('textShadowBlur').addEventListener('input', updateTextShadow);
+        document.getElementById('textShadowOffsetX').addEventListener('input', updateTextShadow);
+        document.getElementById('textShadowOffsetY').addEventListener('input', updateTextShadow);
+        document.getElementById('textShadowColor').addEventListener('change', saveCanvasState);
+        document.getElementById('textShadowBlur').addEventListener('change', saveCanvasState);
+        document.getElementById('textShadowOffsetX').addEventListener('change', saveCanvasState);
+        document.getElementById('textShadowOffsetY').addEventListener('change', saveCanvasState);
+
+
+        /* Text Background */
+        function updateTextBackground() {
+            const activeObject = canvas.getActiveObject();
+            if (activeObject && activeObject.type === 'i-text') {
+                const color = document.getElementById('textBgColor').value;
+                const opacity = parseFloat(document.getElementById('textBgOpacity').value);
+                const radius = parseInt(document.getElementById('textBgRadius').value);
+
+                activeObject.set({
+                    backgroundColor: new fabric.Color(color).setAlpha(opacity).toRgba(),
+                    textBackgroundRadius: radius 
+                });
+                canvas.renderAll();
+            }
+        }
+        document.getElementById('textBgColor').addEventListener('input', updateTextBackground);
+        document.getElementById('textBgOpacity').addEventListener('input', updateTextBackground);
+        document.getElementById('textBgRadius').addEventListener('input', updateTextBackground);
+        document.getElementById('textBgColor').addEventListener('change', saveCanvasState);
+        document.getElementById('textBgOpacity').addEventListener('change', saveCanvasState);
+        document.getElementById('textBgRadius').addEventListener('change', saveCanvasState);
+
 
         /* Image Opacity */
         document.getElementById('panelOpacity').addEventListener('input', function() {
@@ -1717,7 +2253,7 @@
         document.getElementById('canvasWidthInput').addEventListener('change', applyCanvasSize);
         document.getElementById('canvasHeightInput').addEventListener('change', applyCanvasSize);
 
-        /* Color Adjustments for Images */
+        /* Color Adjustments for Images/Background Image */
         document.getElementById('brightnessRange').addEventListener('input', applyImageFilters);
         document.getElementById('contrastRange').addEventListener('input', applyImageFilters);
         document.getElementById('saturationRange').addEventListener('input', applyImageFilters);
@@ -1728,20 +2264,21 @@
         document.getElementById('hueRange').addEventListener('change', saveCanvasState);
 
 
-        /* --- Sidebar Button Event Listeners --- */
-        document.getElementById('addTextBtn').addEventListener('click', addText);
-        document.getElementById('addShapeBtn').addEventListener('click', () => showModal('addShapeModal'));
-        document.getElementById('addOverlayImageBtn').addEventListener('click', () => showCropperModal(false, 'overlay')); /* New Overlay Image button */
-        document.getElementById('setBgImageBtn').addEventListener('click', () => showCropperModal(false, 'background')); /* New Background Image button */
-        document.getElementById('setBgColorBtn').addEventListener('click', () => showPropertyPanel('background_color'));
-        document.getElementById('loadTemplateBtn').addEventListener('click', () => showModal('templateModal'));
-        document.getElementById('canvasSizeBtn').addEventListener('click', () => showPropertyPanel('canvas_size'));
-
-        /* Text Color and Font Modals from sidebar */
+        /* --- Top Menu Bar Button Event Listeners --- */
+        document.getElementById('downloadBtn').addEventListener('click', downloadThumbnail);
+        document.getElementById('clearCanvasBtn').addEventListener('click', clearCanvas);
+        document.getElementById('undoBtn').addEventListener('click', undo);
+        document.getElementById('redoBtn').addEventListener('click', redo);
+        
+        /* --- Bottom Toolbar Button Event Listeners --- */
+        document.getElementById('addTextBtn').addEventListener('click', openAddTextModal); // Changed to open add text modal
+        document.getElementById('editTextBtn').addEventListener('click', openEditTextModal); // New: Edit Text button listener
+        
         document.getElementById('openTextColorModalBtn').addEventListener('click', function() {
             const activeObject = canvas.getActiveObject();
             if (activeObject && activeObject.type === 'i-text') {
-                document.getElementById('modalTextColorInput').value = activeObject.fill; /* Set current color */
+                // If there's an active selection, get its color. Else, get whole text color.
+                document.getElementById('modalTextColorInput').value = activeObject.getSelectionStyles()[0]?.fill || activeObject.fill || '#000000';
                 showModal('textColorPickerModal');
             } else {
                 alert('রঙ পরিবর্তন করতে অনুগ্রহ করে ক্যানভাসে একটি টেক্সট নির্বাচন করুন!');
@@ -1778,47 +2315,50 @@
         });
 
 
-        /* Right sidebar action buttons */
+        document.getElementById('addShapeBtn').addEventListener('click', () => showModal('addShapeModal'));
+        document.getElementById('addOverlayImageBtn').addEventListener('click', () => showCropperModal(false, 'overlay'));
+        document.getElementById('setBgImageBtn').addEventListener('click', () => showCropperModal(false, 'background'));
+        document.getElementById('setBgColorBtn').addEventListener('click', () => showPropertyPanel('background_color'));
+        document.getElementById('openColorAdjustmentsBtn').addEventListener('click', () => showPropertyPanel('color_adjustments_direct'));
+        document.getElementById('loadTemplateBtn').addEventListener('click', () => showModal('templateModal'));
+        document.getElementById('canvasSizeBtn').addEventListener('click', () => showPropertyPanel('canvas_size'));
+        document.getElementById('openLayersPanelBtn').addEventListener('click', () => showModal('layersPanelModal')); // Open Layers modal
         document.getElementById('deleteObjectBtn').addEventListener('click', deleteSelectedObject);
-        document.getElementById('clearCanvasBtn').addEventListener('click', clearCanvas);
-        document.getElementById('downloadBtn').addEventListener('click', downloadThumbnail);
-        
-        /* Floating controls action buttons */
-        document.getElementById('undoBtn').addEventListener('click', undo);
-        document.getElementById('redoBtn').addEventListener('click', redo);
-        document.getElementById('bringForwardBtn').addEventListener('click', bringForward);
-        document.getElementById('sendBackwardBtn').addEventListener('click', sendBackward);
 
         /* Zoom controls action buttons */
         document.getElementById('zoomInBtn').addEventListener('click', zoomIn);
         document.getElementById('zoomOutBtn').addEventListener('click', zoomOut);
         document.getElementById('resetZoomBtn').addEventListener('click', resetZoom);
 
-        /* Lock Object Button */
-        document.getElementById('lockObjectBtn').addEventListener('click', toggleLockObject);
+        /* Lock Object Button in Property Panel */
+        document.getElementById('globalLockUnlockBtn').addEventListener('click', toggleLockObjectFromGlobalButton); // Global lock button
+
+        /* Image Roundness button */
+        document.getElementById('toggleImageRoundnessBtn').addEventListener('click', toggleImageRoundness);
+
 
         /* Color Overlay Modal for images */
         document.getElementById('overlayColorInput').addEventListener('input', function() {
             const activeObject = canvas.getActiveObject();
             if (activeObject && activeObject.type === 'image') {
-                activeObject.set({ overlayColor: this.value });
+                activeObject.set({ fill: this.value, overlayColor: this.value });
                 canvas.renderAll();
             }
         });
         document.getElementById('overlayOpacityRange').addEventListener('input', function() {
             const activeObject = canvas.getActiveObject();
             if (activeObject && activeObject.type === 'image') {
-                activeObject.set({ overlayOpacity: parseFloat(this.value) });
+                activeObject.set({ opacity: parseFloat(this.value), overlayOpacity: parseFloat(this.value) });
                 canvas.renderAll();
             }
         });
-         document.querySelectorAll('#colorOverlayModal .color-option-box').forEach(box => {
+        document.querySelectorAll('#colorOverlayModal .color-option-box').forEach(box => {
             box.addEventListener('click', function() {
                 const color = this.dataset.color;
-                document.getElementById('overlayColorInput').value = color; // Update color input
+                document.getElementById('overlayColorInput').value = color;
                 const activeObject = canvas.getActiveObject();
                  if (activeObject && activeObject.type === 'image') {
-                    activeObject.set({ overlayColor: color });
+                    activeObject.set({ fill: color, overlayColor: color });
                     canvas.renderAll();
                 }
             });
@@ -1828,20 +2368,20 @@
         /* --- Canvas Responsiveness and Initial Setup --- */
         function resizeCanvas() {
             const canvasArea = document.querySelector('.canvas-area');
-            const availableWidth = canvasArea.offsetWidth - 20; /* Account for padding */
+            const availableWidth = canvasArea.offsetWidth - 20;
             const availableHeight = canvasArea.offsetHeight - 20;
 
             let newWidth, newHeight;
             const aspectRatio = 16 / 9;
 
-            if (availableWidth / availableHeight > aspectRatio) {
-                newHeight = availableHeight;
-                newWidth = availableHeight * aspectRatio;
-            } else {
-                newWidth = availableWidth;
-                newHeight = availableWidth / aspectRatio;
+            if (availableWidth / availableHeight > aspectRatio) { 
+                 newHeight = availableHeight;
+                 newWidth = availableHeight * aspectRatio;
+            } else { 
+                 newWidth = availableWidth;
+                 newHeight = availableWidth / aspectRatio;
             }
-
+            
             const canvasWrapper = document.querySelector('.canvas-wrapper');
             canvasWrapper.style.width = `${newWidth}px`;
             canvasWrapper.style.height = `${newHeight}px`;
@@ -1852,6 +2392,35 @@
         window.addEventListener('resize', resizeCanvas);
         window.addEventListener('orientationchange', resizeCanvas);
         resizeCanvas(); /* Initial resize on load */
+
+        // Custom render function for text background radius
+        // This is a workaround as Fabric.js does not natively support rounded corners for text background.
+        // It draws a rounded rectangle behind the text manually.
+        fabric.IText.prototype._renderTextBackground = function(ctx) {
+            if (!this.backgroundColor && !this.textBackgroundRadius) {
+                return;
+            }
+            let dim = this._getTextWidthHeight(ctx, this.text);
+            ctx.fillStyle = this.backgroundColor || 'transparent'; // Use background color
+            
+            const textLeft = -dim.width / 2;
+            const textTop = -dim.height / 2;
+            const radius = this.textBackgroundRadius || 0;
+
+            // Draw rounded rectangle
+            ctx.beginPath();
+            ctx.moveTo(textLeft + radius, textTop);
+            ctx.lineTo(textLeft + dim.width - radius, textTop);
+            ctx.quadraticCurveTo(textLeft + dim.width, textTop, textLeft + dim.width, textTop + radius);
+            ctx.lineTo(textLeft + dim.width, textTop + dim.height - radius);
+            ctx.quadraticCurveTo(textLeft + dim.width, textTop + dim.height, textLeft + dim.width - radius, textTop + dim.height);
+            ctx.lineTo(textLeft + radius, textTop + dim.height);
+            ctx.quadraticCurveTo(textLeft, textTop + dim.height, textLeft, textTop + dim.height - radius);
+            ctx.lineTo(textLeft, textTop + radius);
+            ctx.quadraticCurveTo(textLeft, textTop, textLeft + radius, textTop);
+            ctx.closePath();
+            ctx.fill();
+        };
 
     </script>
 </body>

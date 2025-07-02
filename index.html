@@ -487,14 +487,14 @@
         }
 
         /* Color Picker Modal */
-        #textColorPickerModal .color-options, #colorOverlayModal .color-options {
+        #textColorPickerModal .color-options, #colorOverlayModal .color-options, #textGradientModal .color-options {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 10px;
             margin-top: 20px;
             justify-items: center;
         }
-        #textColorPickerModal .color-option-box, #colorOverlayModal .color-option-box {
+        #textColorPickerModal .color-option-box, #colorOverlayModal .color-option-box, #textGradientModal .color-option-box {
             width: 45px;
             height: 45px;
             border-radius: 50%;
@@ -503,11 +503,11 @@
             transition: transform 0.1s ease, border-color 0.2s;
             box-shadow: var(--shadow-soft);
         }
-        #textColorPickerModal .color-option-box:hover, #colorOverlayModal .color-option-box:hover {
+        #textColorPickerModal .color-option-box:hover, #colorOverlayModal .color-option-box:hover, #textGradientModal .color-option-box:hover {
             transform: scale(1.1);
             border-color: var(--primary-color);
         }
-        #textColorPickerModal input[type="color"], #colorOverlayModal input[type="color"] {
+        #textColorPickerModal input[type="color"], #colorOverlayModal input[type="color"], #textGradientModal input[type="color"] {
             width: 100%;
             height: 50px;
             margin-top: 20px;
@@ -688,9 +688,10 @@
         </div>
 
         <div class="bottom-toolbar">
-            <button id="addTextBtn" title="Add Text"><i class="fas fa-font"></i></button>
-            <button id="editTextBtn" title="Edit Text" style="display:none;"><i class="fas fa-edit"></i></button> <button id="openTextColorModalBtn" title="Text Color"><i class="fas fa-palette"></i></button>
+            <button id="addNewTextBtn" title="Add New Text"><i class="fas fa-plus-square"></i></button> <button id="editTextBtn" title="Edit Text" style="display:none;"><i class="fas fa-edit"></i></button>
+            <button id="openTextColorModalBtn" title="Text Color"><i class="fas fa-palette"></i></button>
             <button id="openFontModalBtn" title="Text Font"><i class="fas fa-text-height"></i></button>
+            <button id="openTextGradientModalBtn" title="Text Gradient"><i class="fas fa-fill"></i></button>
             <button id="addShapeBtn" title="Add Shape"><i class="fas fa-shapes"></i></button>
             <button id="addOverlayImageBtn" title="Add Overlay Image"><i class="fas fa-images"></i></button>
             <button id="setBgImageBtn" title="Set Background Image"><i class="fas fa-image-polaroid"></i></button>
@@ -994,6 +995,29 @@
                     </div>
             </div>
         </div>
+        
+        <div id="textGradientModal" class="modal-overlay">
+            <div class="modal-content">
+                <button class="close-btn" onclick="hideModal('textGradientModal')"><i class="fas fa-times"></i></button>
+                <h3>Apply Text Gradient</h3>
+                <div class="gradient-color-pickers">
+                    <label for="gradientColor1">Color 1:</label>
+                    <input type="color" id="gradientColor1" value="#ff0000">
+                    <label for="gradientColor2">Color 2:</label>
+                    <input type="color" id="gradientColor2" value="#0000ff">
+                </div>
+                <div class="gradient-direction">
+                    <button data-direction="0" class="gradient-direction-btn active">Horizontal</button>
+                    <button data-direction="90">Vertical</button>
+                    <button data-direction="45">Diagonal (down)</button>
+                    <button data-direction="135">Diagonal (up)</button>
+                </div>
+                <div class="modal-buttons" style="margin-top: 20px;">
+                    <button onclick="applyTextGradient()"><i class="fas fa-check-circle"></i> Apply Gradient</button>
+                    <button class="cancel" onclick="hideModal('textGradientModal')"><i class="fas fa-times"></i> Cancel</button>
+                </div>
+            </div>
+        </div>
 
 
     </div>
@@ -1018,18 +1042,18 @@
                 isRedoing = false;
                 history = history.slice(0, historyPointer + 1);
             }
-            // Include custom properties for locking, image overlays, stroke, shadow, background for text
+            // Include custom properties for locking, image overlays, stroke, shadow, background for text, gradient
             const json = JSON.stringify(canvas.toJSON([
                 'lockMovementX', 'lockMovementY', 'lockRotation', 'lockScalingX', 'lockScalingY',
                 'lockSkewingX', 'lockSkewingY', 'selectable', 'evented', 'hasControls',
                 'overlayColor', 'overlayOpacity', 'compositeOperation', 'clipPath', // For round images
                 'stroke', 'strokeWidth', 'shadow', 'backgroundColor', 'textBackgroundColor', 'textBackgroundRadius', // For text styles
-                'fill' // Ensure fill is included for partial text styling
+                'fill' // Ensure fill is included for partial text styling and gradients
             ]));
             history.push(json);
             historyPointer = history.length - 1;
             updateUndoRedoButtons();
-            updateLayersPanel(); // Update layers panel whenever canvas state changes
+            // updateLayersPanel(); // Do not call here to prevent automatic popup
         }
 
         function undo() {
@@ -1062,7 +1086,7 @@
                                 strokeWidth: obj.strokeWidth,
                                 textBackgroundColor: obj.textBackgroundColor, // Ensure text background properties are set
                                 textBackgroundRadius: obj.textBackgroundRadius, // For round text background
-                                fill: obj.fill // Ensure partial fills are applied
+                                fill: obj.fill // Ensure fills are applied (including gradients)
                             });
                         }
                         // Set lock state correctly
@@ -1174,7 +1198,7 @@
         canvas.on('text:selection:changed', function(options) {
             const activeObject = canvas.getActiveObject();
             if (activeObject && activeObject.type === 'i-text') {
-                if (activeObject.selectionStart !== activeObject.selectionEnd) {
+                if (activeObject.isEditing && activeObject.selectionStart !== activeObject.selectionEnd) {
                     const selectedStyles = activeObject.getSelectionStyles();
                     const firstColor = selectedStyles[0]?.fill;
                     const allSameColor = selectedStyles.every(style => style.fill === firstColor);
@@ -1294,14 +1318,16 @@
         // Function to add or edit text based on current mode
         let currentEditingTextObject = null; // Store reference to the text object being edited
 
-        function openAddTextModal() {
+        // NEW: Function to open the add text modal specifically for adding new text
+        function openAddNewTextModal() {
             document.getElementById('addTextModal').classList.add('active');
-            document.getElementById('textInputArea').value = '';
+            document.getElementById('textInputArea').value = ''; // Ensure it's empty for new text
             document.getElementById('confirmAddUpdateTextBtn').textContent = 'Add Text';
-            document.getElementById('confirmAddUpdateTextBtn').onclick = addTextToCanvas;
-            currentEditingTextObject = null;
+            document.getElementById('confirmAddUpdateTextBtn').onclick = addTextToCanvas; // Set function for adding
+            currentEditingTextObject = null; // No object is being edited yet
         }
 
+        // Original function, now for editing existing text
         function openEditTextModal() {
             const activeObject = canvas.getActiveObject();
             if (activeObject && activeObject.type === 'i-text') {
@@ -1368,7 +1394,9 @@
                 shape = new fabric.Rect(options);
             } else if (shapeType === 'circle') {
                 shape = new fabric.Circle({ ...options, radius: 50 });
-            } else if (shapeType === 'triangle') {
+            }
+            // For triangle, Fabric.js uses `height` and `width` implicitly to define points
+            else if (shapeType === 'triangle') {
                 shape = new fabric.Triangle(options);
             }
 
@@ -1956,10 +1984,10 @@
                     if (!obj._isBackground) {
                         canvas.setActiveObject(obj);
                         canvas.renderAll();
-                        hideModal('layersPanelModal'); // Close layers panel after selection
+                        // hideModal('layersPanelModal'); // Do not hide modal automatically
                     } else {
                          // If background is clicked, just close panel.
-                         hideModal('layersPanelModal');
+                         // hideModal('layersPanelModal');
                     }
                 });
 
@@ -1967,9 +1995,7 @@
                 lockButton.addEventListener('click', (e) => {
                     e.stopPropagation(); // Prevent layer item click event from propagating to item selection
                     if (obj._isBackground) {
-                        // For background image, you might implement custom locking logic if needed.
-                        // For now, it's not directly lockable via layer panel as it doesn't have selectable props.
-                        alert('ব্যাকগ্রাউন্ড ইমেজকে সরাসরি লেয়ার প্যানেল থেকে লক/আনলক করা যাবে না।');
+                        alert('ব্যাকগ্রাউন্ড ইমেজকে সরাসরি লেয়ার প্যানেল থেকে লক/আনলক করা যাবে না। অনুগ্রহ করে ক্যানভাসে ছবি হিসেবে যোগ করুন যদি এটিকে লক/আনলক করতে চান।');
                     } else {
                         toggleLockObjectFromLayer(obj);
                     }
@@ -1977,7 +2003,7 @@
 
                 layerListDiv.appendChild(layerItem);
             });
-            // showModal('layersPanelModal'); // Do not show modal automatically after update
+            // showModal('layersPanelModal'); // Do not show modal automatically after update - this was the cause of repeat popup
         }
 
 
@@ -2271,20 +2297,19 @@
         document.getElementById('redoBtn').addEventListener('click', redo);
         
         /* --- Bottom Toolbar Button Event Listeners --- */
-        document.getElementById('addTextBtn').addEventListener('click', openAddTextModal); // Changed to open add text modal
-        document.getElementById('editTextBtn').addEventListener('click', openEditTextModal); // New: Edit Text button listener
+        document.getElementById('addNewTextBtn').addEventListener('click', openAddNewTextModal); // NEW: Opens modal for adding new text
+        document.getElementById('editTextBtn').addEventListener('click', openEditTextModal); // For editing existing text
         
         document.getElementById('openTextColorModalBtn').addEventListener('click', function() {
             const activeObject = canvas.getActiveObject();
             if (activeObject && activeObject.type === 'i-text') {
-                // If there's an active selection, get its color. Else, get whole text color.
                 document.getElementById('modalTextColorInput').value = activeObject.getSelectionStyles()[0]?.fill || activeObject.fill || '#000000';
                 showModal('textColorPickerModal');
             } else {
                 alert('রঙ পরিবর্তন করতে অনুগ্রহ করে ক্যানভাসে একটি টেক্সট নির্বাচন করুন!');
             }
         });
-
+        
         document.getElementById('openFontModalBtn').addEventListener('click', function() {
             const activeObject = canvas.getActiveObject();
             if (activeObject && activeObject.type === 'i-text') {
@@ -2314,6 +2339,68 @@
             });
         });
 
+        /* Text Gradient */
+        document.getElementById('openTextGradientModalBtn').addEventListener('click', function() {
+            const activeObject = canvas.getActiveObject();
+            if (activeObject && activeObject.type === 'i-text') {
+                // Populate initial colors if gradient already exists
+                if (activeObject.fill && activeObject.fill.colorStops) {
+                    document.getElementById('gradientColor1').value = activeObject.fill.colorStops[0].color;
+                    document.getElementById('gradientColor2').value = activeObject.fill.colorStops[1].color;
+                } else { // Default to red and blue
+                    document.getElementById('gradientColor1').value = '#ff0000';
+                    document.getElementById('gradientColor2').value = '#0000ff';
+                }
+                showModal('textGradientModal');
+            } else {
+                alert('গ্রেডিয়েন্ট প্রয়োগ করতে অনুগ্রহ করে একটি টেক্সট নির্বাচন করুন!');
+            }
+        });
+
+        document.querySelectorAll('#textGradientModal .gradient-direction button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('#textGradientModal .gradient-direction button').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        function applyTextGradient() {
+            const activeObject = canvas.getActiveObject();
+            if (activeObject && activeObject.type === 'i-text') {
+                const color1 = document.getElementById('gradientColor1').value;
+                const color2 = document.getElementById('gradientColor2').value;
+                const activeDirectionBtn = document.querySelector('#textGradientModal .gradient-direction button.active');
+                const directionAngle = activeDirectionBtn ? parseInt(activeDirectionBtn.dataset.direction) : 0; // Default to 0 deg (horizontal)
+
+                let coords; // Gradient coordinates
+                // Gradients are tricky with scaling. For Fabric.js IText, coordinates are relative to the bounding box of the text object.
+                // We'll calculate based on activeObject.width and activeObject.height
+                if (directionAngle === 0) { // Horizontal
+                    coords = { x1: 0, y1: activeObject.height / 2, x2: activeObject.width, y2: activeObject.height / 2 };
+                } else if (directionAngle === 90) { // Vertical
+                    coords = { x1: activeObject.width / 2, y1: 0, x2: activeObject.width / 2, y2: activeObject.height };
+                } else if (directionAngle === 45) { // Diagonal (top-left to bottom-right)
+                    coords = { x1: 0, y1: 0, x2: activeObject.width, y2: activeObject.height };
+                } else if (directionAngle === 135) { // Diagonal (top-right to bottom-left)
+                    coords = { x1: activeObject.width, y1: 0, x2: 0, y2: activeObject.height };
+                }
+                
+                const gradient = new fabric.Gradient({
+                    type: 'linear',
+                    coords: coords,
+                    colorStops: [
+                        { offset: 0, color: color1 },
+                        { offset: 1, color: color2 }
+                    ]
+                });
+                
+                activeObject.set({ fill: gradient });
+                canvas.renderAll();
+                saveCanvasState();
+            }
+            hideModal('textGradientModal');
+        }
+
 
         document.getElementById('addShapeBtn').addEventListener('click', () => showModal('addShapeModal'));
         document.getElementById('addOverlayImageBtn').addEventListener('click', () => showCropperModal(false, 'overlay'));
@@ -2322,7 +2409,7 @@
         document.getElementById('openColorAdjustmentsBtn').addEventListener('click', () => showPropertyPanel('color_adjustments_direct'));
         document.getElementById('loadTemplateBtn').addEventListener('click', () => showModal('templateModal'));
         document.getElementById('canvasSizeBtn').addEventListener('click', () => showPropertyPanel('canvas_size'));
-        document.getElementById('openLayersPanelBtn').addEventListener('click', () => showModal('layersPanelModal')); // Open Layers modal
+        document.getElementById('openLayersPanelBtn').addEventListener('click', updateLayersPanel); // Open Layers modal
         document.getElementById('deleteObjectBtn').addEventListener('click', deleteSelectedObject);
 
         /* Zoom controls action buttons */

@@ -70,17 +70,17 @@
             box-shadow: var(--shadow-medium);
             overflow: hidden;
             border-radius: var(--border-radius);
-            margin: 10px;
+            margin: 5px; /* Reduced margin */
         }
 
         /* Top Menu Bar (Save, Clear, Undo/Redo) */
         .top-menu-bar {
-            height: 60px;
+            height: 50px; /* Slightly smaller height */
             background-color: var(--secondary-color);
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 0 10px;
+            padding: 0 5px; /* Reduced padding */
             box-shadow: var(--shadow-soft);
             z-index: 10;
         }
@@ -88,14 +88,14 @@
             background: none;
             border: none;
             color: rgba(255, 255, 255, 0.8);
-            font-size: 1.4em;
-            padding: 10px;
+            font-size: 1.2em; /* Smaller font size */
+            padding: 8px; /* Reduced padding */
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.2s ease, color 0.2s ease;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 3px; /* Reduced gap */
         }
         .top-menu-bar button:hover:not([disabled]), .top-menu-bar button:active:not([disabled]) {
             background-color: var(--primary-color);
@@ -115,7 +115,7 @@
             align-items: center;
             background-color: var(--bg-dark);
             position: relative;
-            padding: 10px;
+            padding: 5px; /* Reduced padding */
             overflow: hidden; /* For zoom/pan effect */
         }
 
@@ -126,7 +126,7 @@
             height: auto;
             aspect-ratio: 16 / 9; /* Maintain aspect ratio */
             background-color: var(--text-light);
-            border: 3px solid var(--primary-color);
+            border: 2px solid var(--primary-color); /* Slightly smaller border */
             box-shadow: var(--shadow-medium);
             border-radius: var(--border-radius);
             overflow: hidden;
@@ -142,17 +142,17 @@
 
         /* Bottom Toolbar / Option Menu */
         .bottom-toolbar {
-            height: 70px; /* Fixed height for toolbar */
+            height: 60px; /* Slightly smaller height */
             background-color: var(--secondary-color);
             display: flex;
             align-items: center;
-            padding: 0 10px;
+            padding: 0 5px; /* Reduced padding */
             box-shadow: var(--shadow-soft);
             z-index: 10;
             overflow-x: auto; /* Enable horizontal scrolling */
             -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
             white-space: nowrap; /* Prevent items from wrapping */
-            gap: 15px; /* Space between buttons */
+            gap: 10px; /* Reduced gap between buttons */
         }
         .bottom-toolbar::-webkit-scrollbar {
             display: none; /* Hide scrollbar for webkit browsers */
@@ -167,8 +167,8 @@
             background: none;
             border: none;
             color: rgba(255, 255, 255, 0.8);
-            font-size: 1.8em; /* Large icons for touch */
-            padding: 10px;
+            font-size: 1.6em; /* Slightly smaller icons for better fit */
+            padding: 8px; /* Reduced padding */
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
@@ -192,13 +192,13 @@
             bottom: 0;
             left: 0;
             width: 100vw; /* Full width for properties */
-            max-height: 70vh; /* Max height to avoid covering canvas too much */
+            max-height: 80vh; /* Allow more height for properties */
             background-color: var(--text-light);
             box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.25);
             z-index: 100;
             display: flex;
             flex-direction: column;
-            padding: 20px;
+            padding: 15px; /* Reduced padding */
             transform: translateY(100%); /* Start off-screen */
             transition: transform 0.3s ease-out;
             overflow-y: auto; /* Enable scrolling for long panels */
@@ -211,41 +211,41 @@
         .property-panel h3 {
             font-family: 'Poppins', sans-serif;
             color: var(--primary-color);
-            margin-bottom: 20px;
+            margin-bottom: 15px; /* Reduced margin */
             text-align: center;
-            font-size: 1.6em;
+            font-size: 1.4em; /* Smaller font size */
             border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
+            padding-bottom: 8px; /* Reduced padding */
         }
         .property-panel label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 3px; /* Reduced margin */
             font-weight: 600;
             color: var(--text-dark);
-            font-size: 0.95em;
+            font-size: 0.9em; /* Smaller font size */
         }
         .property-panel input[type="text"],
         .property-panel input[type="number"],
         .property-panel input[type="color"],
         .property-panel select,
         .property-panel input[type="range"] {
-            width: calc(100% - 18px); /* Adjust for padding */
-            padding: 10px;
+            width: calc(100% - 16px); /* Adjust for padding */
+            padding: 8px; /* Reduced padding */
             border: 1px solid #ddd;
             border-radius: 5px;
-            margin-bottom: 15px;
-            font-size: 1em;
+            margin-bottom: 10px; /* Reduced margin */
+            font-size: 0.9em; /* Smaller font size */
             background-color: var(--bg-light);
             color: var(--text-dark);
         }
         .property-panel .close-btn {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 5px; /* Adjusted position */
+            right: 5px; /* Adjusted position */
             background: none;
             border: none;
             color: var(--text-dark);
-            font-size: 1.8em;
+            font-size: 1.5em; /* Smaller font size */
             padding: 5px;
             border-radius: 50%;
             transition: background-color 0.2s;
@@ -256,36 +256,36 @@
         .property-group {
             border: 1px solid #eee;
             border-radius: var(--border-radius);
-            padding: 15px;
-            margin-bottom: 20px;
+            padding: 10px; /* Reduced padding */
+            margin-bottom: 15px; /* Reduced margin */
             background-color: var(--bg-light);
         }
         .property-group h4 {
             margin-top: 0;
-            margin-bottom: 15px;
+            margin-bottom: 10px; /* Reduced margin */
             color: var(--secondary-color);
-            font-size: 1.2em;
+            font-size: 1.1em; /* Smaller font size */
             border-bottom: 1px dashed #ccc;
-            padding-bottom: 8px;
+            padding-bottom: 5px; /* Reduced padding */
         }
         .property-group .button-row {
             display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
+            gap: 8px; /* Reduced gap */
+            margin-bottom: 8px; /* Reduced margin */
             flex-wrap: wrap;
         }
         .property-group .button-row button {
             background-color: var(--accent-color);
             color: var(--text-light);
             border: none;
-            padding: 10px 15px;
+            padding: 8px 12px; /* Reduced padding */
             border-radius: 5px;
             cursor: pointer;
-            font-size: 0.9em;
+            font-size: 0.8em; /* Smaller font size */
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 5px;
+            gap: 3px; /* Reduced gap */
             flex-grow: 1;
             transition: background-color 0.2s;
         }
@@ -295,12 +295,12 @@
         .color-palette {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-            margin-bottom: 15px;
+            gap: 6px; /* Reduced gap */
+            margin-bottom: 10px; /* Reduced margin */
         }
         .color-box {
-            width: 35px;
-            height: 35px;
+            width: 30px; /* Smaller size */
+            height: 30px; /* Smaller size */
             border-radius: 50%;
             border: 2px solid #ddd;
             cursor: pointer;
@@ -336,14 +336,14 @@
             background-color: var(--text-light);
             border-radius: var(--border-radius);
             box-shadow: var(--shadow-medium);
-            padding: 25px;
-            max-width: 90vw;
-            max-height: 90vh;
+            padding: 20px; /* Reduced padding */
+            max-width: 95vw; /* Wider for better use of mobile screen */
+            max-height: 95vh; /* Taller for better use of mobile screen */
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             position: relative;
-            transform: translateY(20px);
+            transform: translateY(10px); /* Smaller animation offset */
             transition: transform 0.3s ease;
         }
         .modal-overlay.active .modal-content {
@@ -352,14 +352,13 @@
 
         .modal-content .close-btn {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 8px; /* Adjusted position */
+            right: 8px; /* Adjusted position */
             background: none;
             border: none;
             color: var(--text-dark);
-            font-size: 1.8em;
-            cursor: pointer;
-            padding: 5px;
+            font-size: 1.5em; /* Smaller font size */
+            padding: 3px; /* Reduced padding */
             border-radius: 50%;
             transition: background-color 0.2s;
         }
@@ -372,11 +371,11 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
+            gap: 10px; /* Reduced gap */
         }
         #imageCropperModal .image-preview-container {
             max-width: 100%;
-            max-height: 400px; /* Limit height for cropper */
+            max-height: 300px; /* Reduced height for cropper */
             overflow: hidden;
             display: flex;
             justify-content: center;
@@ -391,26 +390,26 @@
         #imageCropperModal .crop-controls {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px; /* Reduced gap */
             justify-content: center;
-            margin-top: 15px;
+            margin-top: 10px; /* Reduced margin */
         }
         #imageCropperModal .crop-controls button {
             background-color: var(--accent-color);
             color: var(--text-light);
             border: none;
-            padding: 8px 12px;
+            padding: 6px 10px; /* Reduced padding */
             border-radius: 5px;
             cursor: pointer;
-            font-size: 0.9em;
+            font-size: 0.8em; /* Smaller font size */
         }
         #imageCropperModal .crop-controls button.active {
             background-color: var(--primary-color);
         }
         #imageCropperModal .modal-buttons {
             display: flex;
-            gap: 10px;
-            margin-top: 20px;
+            gap: 8px; /* Reduced gap */
+            margin-top: 15px; /* Reduced margin */
             flex-wrap: wrap;
         }
         #imageCropperModal .modal-buttons button {
@@ -418,14 +417,14 @@
             background-color: var(--accent-color);
             color: var(--text-light);
             border: none;
-            padding: 10px 15px;
+            padding: 8px 12px; /* Reduced padding */
             border-radius: 5px;
             cursor: pointer;
-            font-size: 1em;
+            font-size: 0.9em; /* Smaller font size */
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 5px; /* Reduced gap */
         }
         #imageCropperModal .modal-buttons button.cancel {
             background-color: #b0bec5; /* Light grey for cancel */
@@ -440,12 +439,12 @@
         /* Template/Font/Color Picker Modal specific styles */
         .template-grid, .font-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Responsive grid */
-            gap: 15px;
-            margin-top: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Adjusted grid size */
+            gap: 10px; /* Reduced gap */
+            margin-top: 10px; /* Reduced margin */
         }
         .template-item, .font-item {
-            border: 2px solid #ddd;
+            border: 1px solid #ddd; /* Smaller border */
             border-radius: var(--border-radius);
             overflow: hidden;
             cursor: pointer;
@@ -453,7 +452,7 @@
             box-shadow: var(--shadow-soft);
         }
         .template-item:hover, .font-item:hover {
-            transform: translateY(-3px);
+            transform: translateY(-2px); /* Smaller hover effect */
             border-color: var(--primary-color);
         }
         .template-item img {
@@ -463,9 +462,9 @@
         }
         .template-item p, .font-item p {
             background-color: #f9f9f9;
-            padding: 8px;
+            padding: 5px; /* Reduced padding */
             margin: 0;
-            font-size: 0.9em;
+            font-size: 0.8em; /* Smaller font size */
             text-align: center;
             color: var(--text-dark);
             font-family: 'Poppins', sans-serif;
@@ -474,31 +473,31 @@
             text-overflow: ellipsis; /* Add ellipsis if text overflows */
         }
         .font-item p {
-            font-size: 1.2em; /* Larger font preview */
-            padding: 15px 8px;
-            min-height: 50px;
+            font-size: 1em; /* Smaller font preview */
+            padding: 10px 5px; /* Reduced padding */
+            min-height: 40px; /* Smaller min-height */
             display: flex;
             align-items: center;
             justify-content: center;
         }
         .font-item.active {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.5);
+            box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.5); /* Smaller shadow */
         }
 
         /* Color Picker Modal */
         #textColorPickerModal .color-options, #colorOverlayModal .color-options, #textGradientModal .color-options {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            margin-top: 20px;
+            gap: 8px; /* Reduced gap */
+            margin-top: 15px; /* Reduced margin */
             justify-items: center;
         }
         #textColorPickerModal .color-option-box, #colorOverlayModal .color-option-box, #textGradientModal .color-option-box {
-            width: 45px;
-            height: 45px;
+            width: 40px; /* Smaller size */
+            height: 40px; /* Smaller size */
             border-radius: 50%;
-            border: 2px solid #ddd;
+            border: 1px solid #ddd; /* Smaller border */
             cursor: pointer;
             transition: transform 0.1s ease, border-color 0.2s;
             box-shadow: var(--shadow-soft);
@@ -509,8 +508,8 @@
         }
         #textColorPickerModal input[type="color"], #colorOverlayModal input[type="color"], #textGradientModal input[type="color"] {
             width: 100%;
-            height: 50px;
-            margin-top: 20px;
+            height: 45px; /* Smaller height */
+            margin-top: 15px; /* Reduced margin */
             padding: 0;
             border: none;
             background: none;
@@ -519,14 +518,14 @@
 
         /* Layers Panel Modal */
         #layersPanelModal .modal-content {
-            max-width: 95vw; /* Wider to accommodate lock buttons */
+            max-width: 95vw;
             max-height: 80vh;
         }
         #layersPanelModal .layer-list {
             display: flex;
             flex-direction: column-reverse; /* Display top layer at top of list */
-            gap: 10px;
-            margin-top: 15px;
+            gap: 8px; /* Reduced gap */
+            margin-top: 10px; /* Reduced margin */
             max-height: 60vh;
             overflow-y: auto;
             padding-right: 5px;
@@ -537,7 +536,7 @@
             background-color: var(--bg-light);
             border: 1px solid #ddd;
             border-radius: 5px;
-            padding: 10px 15px;
+            padding: 8px 12px; /* Reduced padding */
             cursor: pointer;
             transition: background-color 0.2s, border-color 0.2s;
             box-shadow: var(--shadow-soft);
@@ -552,8 +551,8 @@
             background-color: #f0f0f0;
         }
         #layersPanelModal .layer-item .layer-icon {
-            font-size: 1.2em;
-            margin-right: 10px;
+            font-size: 1.1em; /* Smaller font size */
+            margin-right: 8px; /* Reduced margin */
             color: var(--secondary-color);
         }
         #layersPanelModal .layer-item .layer-name {
@@ -567,10 +566,10 @@
         #layersPanelModal .layer-item .layer-lock-btn {
             background: none;
             border: none;
-            font-size: 1.2em;
+            font-size: 1.1em; /* Smaller font size */
             color: var(--text-dark);
             cursor: pointer;
-            padding: 5px;
+            padding: 3px; /* Reduced padding */
             border-radius: 50%;
             transition: color 0.2s, background-color 0.2s;
         }
@@ -582,9 +581,9 @@
         }
         /* Style for partial text coloring example */
         .partial-text-example {
-            font-size: 1.2em;
+            font-size: 1em; /* Smaller font size */
             text-align: center;
-            margin-top: 15px;
+            margin-top: 10px; /* Reduced margin */
             color: #555;
         }
 
@@ -592,17 +591,18 @@
         #addTextModal h3 {
             font-family: 'Poppins', sans-serif;
             color: var(--secondary-color);
-            margin-bottom: 15px;
+            margin-bottom: 10px; /* Reduced margin */
             text-align: center;
+            font-size: 1.4em; /* Smaller font size */
         }
         #addTextModal textarea {
-            width: calc(100% - 20px);
-            height: 100px;
-            padding: 10px;
+            width: calc(100% - 16px); /* Adjusted width for padding */
+            height: 80px; /* Reduced height */
+            padding: 8px; /* Reduced padding */
             border: 1px solid #ddd;
             border-radius: 5px;
-            margin-bottom: 15px;
-            font-size: 1em;
+            margin-bottom: 10px; /* Reduced margin */
+            font-size: 0.9em; /* Smaller font size */
             resize: vertical;
         }
         #addTextModal .modal-buttons button {
@@ -610,14 +610,14 @@
             background-color: var(--accent-color);
             color: var(--text-light);
             border: none;
-            padding: 10px 15px;
+            padding: 8px 12px; /* Reduced padding */
             border-radius: 5px;
             cursor: pointer;
-            font-size: 1em;
+            font-size: 0.9em; /* Smaller font size */
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 5px; /* Reduced gap */
         }
         #addTextModal .modal-buttons button.cancel {
             background-color: #b0bec5;
@@ -625,16 +625,16 @@
         }
         #addTextModal .modal-buttons {
             display: flex;
-            gap: 10px;
-            margin-top: 20px;
+            gap: 8px; /* Reduced gap */
+            margin-top: 15px; /* Reduced margin */
             flex-wrap: wrap;
         }
 
         /* Lock Icon next to zoom controls */
         .lock-icon-area {
             position: absolute;
-            top: 15px;
-            left: 15px; /* Moved to left side to avoid zoom controls */
+            top: 10px; /* Adjusted position */
+            left: 10px; /* Adjusted position */
             display: flex;
             flex-direction: column;
             gap: 5px;
@@ -648,8 +648,8 @@
             background: none;
             border: none;
             color: var(--text-light);
-            font-size: 1.1em;
-            padding: 8px;
+            font-size: 1em; /* Smaller font size */
+            padding: 6px; /* Reduced padding */
             border-radius: 4px;
             cursor: pointer;
             transition: background-color 0.2s;
@@ -688,8 +688,7 @@
         </div>
 
         <div class="bottom-toolbar">
-            <button id="addNewTextBtn" title="Add New Text"><i class="fas fa-plus-square"></i></button> <button id="editTextBtn" title="Edit Text" style="display:none;"><i class="fas fa-edit"></i></button>
-            <button id="openTextColorModalBtn" title="Text Color"><i class="fas fa-palette"></i></button>
+            <button id="addNewTextBtn" title="Add New Text"><i class="fas fa-plus-square"></i></button> <button id="editTextBtn" title="Edit Text" style="display:none;"><i class="fas fa-edit"></i></button> <button id="openTextColorModalBtn" title="Text Color"><i class="fas fa-palette"></i></button>
             <button id="openFontModalBtn" title="Text Font"><i class="fas fa-text-height"></i></button>
             <button id="openTextGradientModalBtn" title="Text Gradient"><i class="fas fa-fill"></i></button>
             <button id="addShapeBtn" title="Add Shape"><i class="fas fa-shapes"></i></button>
@@ -1318,7 +1317,6 @@
         // Function to add or edit text based on current mode
         let currentEditingTextObject = null; // Store reference to the text object being edited
 
-        // NEW: Function to open the add text modal specifically for adding new text
         function openAddNewTextModal() {
             document.getElementById('addTextModal').classList.add('active');
             document.getElementById('textInputArea').value = ''; // Ensure it's empty for new text
@@ -2003,7 +2001,7 @@
 
                 layerListDiv.appendChild(layerItem);
             });
-            // showModal('layersPanelModal'); // Do not show modal automatically after update - this was the cause of repeat popup
+            showModal('layersPanelModal'); // Show modal after update
         }
 
 
@@ -2040,7 +2038,7 @@
                 }
                 if (e.target.type === 'image') {
                     showPropertyPanel('image');
-                } else if (e.target.type === 'rect' || e.target.type === 'circle' || e.target.type === 'triangle') {
+                } else if (e.target.type === 'rect' || e.target.type === 'circle' || e.type === 'triangle') {
                     showPropertyPanel('shape');
                 }
                 updateGlobalLockButton();

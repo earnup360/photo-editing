@@ -11,17 +11,19 @@
     <style>
         /* CSS Variables for theming */
         :root {
-            --primary-color: #f44336; /* Deep Red for actions/accents */
-            --secondary-color: #212121; /* Dark Black/Grey for top/bottom bars */
-            --accent-color: #424242; /* Medium Grey for buttons/hover */
-            --bg-light: #eceff1; /* Light Grey for main background */
-            --bg-dark: #b0bec5; /* Medium Grey for canvas area */
-            --text-dark: #212121;
+            --primary-color: #ff5e5e; /* Vibrant Red for actions/accents */
+            --secondary-color: #2c3e50; /* Dark Blue-Grey for top/bottom bars */
+            --accent-color: #3498db; /* Medium Blue for buttons/hover */
+            --bg-light: #f5f7fa; /* Light Grey for main background */
+            --bg-dark: #dfe6e9; /* Medium Grey for canvas area */
+            --text-dark: #2d3436;
             --text-light: #ffffff;
             --border-color: rgba(255, 255, 255, 0.15);
-            --shadow-soft: 0 2px 5px rgba(0, 0, 0, 0.15);
-            --shadow-medium: 0 5px 15px rgba(0, 0, 0, 0.25);
+            --shadow-soft: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --shadow-medium: 0 5px 20px rgba(0, 0, 0, 0.2);
             --border-radius: 8px;
+            --toolbar-height: 60px;
+            --artboard-size: 5000px; /* Large artboard size */
         }
 
         body {
@@ -29,11 +31,11 @@
             margin: 0;
             padding: 0;
             display: flex;
-            flex-direction: column; /* Vertical layout */
+            flex-direction: column;
             background-color: var(--bg-light);
             min-height: 100vh;
-            overflow: hidden; /* Prevent scrolling */
-            touch-action: manipulation; /* Allow touch interactions without default browser actions */
+            overflow: hidden;
+            touch-action: manipulation;
             color: var(--text-dark);
         }
 
@@ -58,132 +60,143 @@
                 box-sizing: border-box;
             }
             .app-container {
-                display: none !important; /* Hide app in landscape */
+                display: none !important;
             }
         }
 
         .app-container {
             display: flex;
-            flex-direction: column; /* Vertical layout */
+            flex-direction: column;
             flex-grow: 1;
             background-color: var(--text-light);
             box-shadow: var(--shadow-medium);
             overflow: hidden;
             border-radius: var(--border-radius);
-            margin: 5px; /* Reduced margin */
+            margin: 5px;
         }
 
         /* Top Menu Bar (Save, Clear, Undo/Redo) */
         .top-menu-bar {
-            height: 50px; /* Slightly smaller height */
+            height: var(--toolbar-height);
             background-color: var(--secondary-color);
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between;
             align-items: center;
-            padding: 0 5px; /* Reduced padding */
+            padding: 0 15px;
             box-shadow: var(--shadow-soft);
             z-index: 10;
         }
         .top-menu-bar button {
-            background: none;
+            background: rgba(255, 255, 255, 0.1);
             border: none;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 1.2em; /* Smaller font size */
-            padding: 8px; /* Reduced padding */
-            border-radius: 5px;
+            color: var(--text-light);
+            font-size: 1em;
+            padding: 8px 15px;
+            border-radius: var(--border-radius);
             cursor: pointer;
-            transition: background-color 0.2s ease, color 0.2s ease;
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
-            gap: 3px; /* Reduced gap */
+            gap: 8px;
+            margin: 0 5px;
         }
-        .top-menu-bar button:hover:not([disabled]), .top-menu-bar button:active:not([disabled]) {
+        .top-menu-bar button:hover:not([disabled]), 
+        .top-menu-bar button:active:not([disabled]) {
             background-color: var(--primary-color);
-            color: var(--text-light);
+            transform: translateY(-2px);
         }
         .top-menu-bar button[disabled] {
             opacity: 0.5;
             cursor: not-allowed;
+            background: rgba(255, 255, 255, 0.05);
         }
-
 
         /* Canvas Area */
         .canvas-area {
-            flex-grow: 1; /* Takes most of the vertical space */
+            flex-grow: 1;
             display: flex;
             justify-content: center;
             align-items: center;
             background-color: var(--bg-dark);
             position: relative;
-            padding: 5px; /* Reduced padding */
-            overflow: hidden; /* For zoom/pan effect */
+            padding: 10px;
+            overflow: hidden;
+            background-image: 
+                linear-gradient(45deg, #ccc 25%, transparent 25%),
+                linear-gradient(-45deg, #ccc 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #ccc 75%),
+                linear-gradient(-45deg, transparent 75%, #ccc 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
         }
 
         .canvas-wrapper {
             position: relative;
             width: 100%;
-            max-width: 1280px; /* Base width for calculation */
-            height: auto;
-            aspect-ratio: 16 / 9; /* Maintain aspect ratio */
+            height: 100%;
             background-color: var(--text-light);
-            border: 2px solid var(--primary-color); /* Slightly smaller border */
+            border: 2px solid var(--primary-color);
             box-shadow: var(--shadow-medium);
             border-radius: var(--border-radius);
             overflow: hidden;
-            touch-action: none; /* Crucial for Fabric.js touch events */
+            touch-action: none;
             transform-origin: center center;
-            transition: transform 0.1s ease-out; /* Smooth zoom */
+            transition: transform 0.1s ease-out;
         }
         canvas {
             display: block;
-            width: 100%; /* Make canvas responsive inside wrapper */
+            width: 100%;
             height: 100%;
         }
 
         /* Bottom Toolbar / Option Menu */
         .bottom-toolbar {
-            height: 60px; /* Slightly smaller height */
+            height: var(--toolbar-height);
             background-color: var(--secondary-color);
             display: flex;
             align-items: center;
-            padding: 0 5px; /* Reduced padding */
+            padding: 0 15px;
             box-shadow: var(--shadow-soft);
             z-index: 10;
-            overflow-x: auto; /* Enable horizontal scrolling */
-            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-            white-space: nowrap; /* Prevent items from wrapping */
-            gap: 10px; /* Reduced gap between buttons */
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            white-space: nowrap;
+            gap: 10px;
         }
         .bottom-toolbar::-webkit-scrollbar {
-            display: none; /* Hide scrollbar for webkit browsers */
+            display: none;
         }
         .bottom-toolbar {
-            -ms-overflow-style: none;  /* Hide scrollbar for IE and Edge */
-            scrollbar-width: none;  /* Hide scrollbar for Firefox */
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
 
         .bottom-toolbar button {
-            flex-shrink: 0; /* Prevent buttons from shrinking */
-            background: none;
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.1);
             border: none;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 1.6em; /* Slightly smaller icons for better fit */
-            padding: 8px; /* Reduced padding */
-            border-radius: 5px;
+            color: var(--text-light);
+            font-size: 1.4em;
+            padding: 10px 15px;
+            border-radius: var(--border-radius);
             cursor: pointer;
-            transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
+            transition: all 0.2s ease;
             display: flex;
             justify-content: center;
             align-items: center;
             outline: none;
+            min-width: 50px;
         }
-        .bottom-toolbar button:hover, .bottom-toolbar button.active {
+        .bottom-toolbar button:hover, 
+        .bottom-toolbar button.active {
             background-color: var(--primary-color);
-            color: var(--text-light);
-            transform: scale(1.05);
+            transform: translateY(-2px);
         }
         .bottom-toolbar button:active {
-            transform: scale(0.95);
+            transform: translateY(0);
+        }
+        .bottom-toolbar button i {
+            pointer-events: none;
         }
 
         /* Property Panel (Slides from bottom) */
@@ -191,64 +204,74 @@
             position: fixed;
             bottom: 0;
             left: 0;
-            width: 100vw; /* Full width for properties */
-            max-height: 80vh; /* Allow more height for properties */
+            width: 100vw;
+            max-height: 80vh;
             background-color: var(--text-light);
             box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.25);
             z-index: 100;
             display: flex;
             flex-direction: column;
-            padding: 15px; /* Reduced padding */
-            transform: translateY(100%); /* Start off-screen */
+            padding: 20px;
+            transform: translateY(100%);
             transition: transform 0.3s ease-out;
-            overflow-y: auto; /* Enable scrolling for long panels */
+            overflow-y: auto;
             border-top-left-radius: var(--border-radius);
             border-top-right-radius: var(--border-radius);
         }
         .property-panel.active {
-            transform: translateY(0); /* Slide in */
+            transform: translateY(0);
         }
         .property-panel h3 {
             font-family: 'Poppins', sans-serif;
             color: var(--primary-color);
-            margin-bottom: 15px; /* Reduced margin */
+            margin: 0 0 20px 0;
             text-align: center;
-            font-size: 1.4em; /* Smaller font size */
+            font-size: 1.4em;
             border-bottom: 1px solid #eee;
-            padding-bottom: 8px; /* Reduced padding */
+            padding-bottom: 10px;
         }
         .property-panel label {
             display: block;
-            margin-bottom: 3px; /* Reduced margin */
+            margin-bottom: 8px;
             font-weight: 600;
             color: var(--text-dark);
-            font-size: 0.9em; /* Smaller font size */
+            font-size: 0.9em;
         }
         .property-panel input[type="text"],
         .property-panel input[type="number"],
         .property-panel input[type="color"],
         .property-panel select,
         .property-panel input[type="range"] {
-            width: calc(100% - 16px); /* Adjust for padding */
-            padding: 8px; /* Reduced padding */
+            width: 100%;
+            padding: 10px;
             border: 1px solid #ddd;
-            border-radius: 5px;
-            margin-bottom: 10px; /* Reduced margin */
-            font-size: 0.9em; /* Smaller font size */
+            border-radius: var(--border-radius);
+            margin-bottom: 15px;
+            font-size: 0.9em;
             background-color: var(--bg-light);
             color: var(--text-dark);
+            transition: border-color 0.2s;
+        }
+        .property-panel input[type="text"]:focus,
+        .property-panel input[type="number"]:focus,
+        .property-panel input[type="color"]:focus,
+        .property-panel select:focus,
+        .property-panel input[type="range"]:focus {
+            border-color: var(--accent-color);
+            outline: none;
         }
         .property-panel .close-btn {
             position: absolute;
-            top: 5px; /* Adjusted position */
-            right: 5px; /* Adjusted position */
+            top: 10px;
+            right: 10px;
             background: none;
             border: none;
             color: var(--text-dark);
-            font-size: 1.5em; /* Smaller font size */
+            font-size: 1.5em;
             padding: 5px;
             border-radius: 50%;
             transition: background-color 0.2s;
+            cursor: pointer;
         }
         .property-panel .close-btn:hover {
             background-color: var(--bg-light);
@@ -256,61 +279,68 @@
         .property-group {
             border: 1px solid #eee;
             border-radius: var(--border-radius);
-            padding: 10px; /* Reduced padding */
-            margin-bottom: 15px; /* Reduced margin */
+            padding: 15px;
+            margin-bottom: 20px;
             background-color: var(--bg-light);
         }
         .property-group h4 {
             margin-top: 0;
-            margin-bottom: 10px; /* Reduced margin */
+            margin-bottom: 15px;
             color: var(--secondary-color);
-            font-size: 1.1em; /* Smaller font size */
+            font-size: 1.1em;
             border-bottom: 1px dashed #ccc;
-            padding-bottom: 5px; /* Reduced padding */
+            padding-bottom: 8px;
         }
         .property-group .button-row {
             display: flex;
-            gap: 8px; /* Reduced gap */
-            margin-bottom: 8px; /* Reduced margin */
+            gap: 10px;
+            margin-bottom: 15px;
             flex-wrap: wrap;
         }
         .property-group .button-row button {
             background-color: var(--accent-color);
             color: var(--text-light);
             border: none;
-            padding: 8px 12px; /* Reduced padding */
-            border-radius: 5px;
+            padding: 10px 15px;
+            border-radius: var(--border-radius);
             cursor: pointer;
-            font-size: 0.8em; /* Smaller font size */
+            font-size: 0.9em;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 3px; /* Reduced gap */
+            gap: 8px;
             flex-grow: 1;
-            transition: background-color 0.2s;
+            transition: all 0.2s;
         }
         .property-group .button-row button:hover {
-            background-color: #555;
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+        .property-group .button-row button:active {
+            transform: translateY(0);
+        }
+        .property-group .button-row button i {
+            font-size: 1.1em;
         }
         .color-palette {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 6px; /* Reduced gap */
-            margin-bottom: 10px; /* Reduced margin */
+            gap: 10px;
+            margin-bottom: 15px;
         }
         .color-box {
-            width: 30px; /* Smaller size */
-            height: 30px; /* Smaller size */
+            width: 35px;
+            height: 35px;
             border-radius: 50%;
             border: 2px solid #ddd;
             cursor: pointer;
-            transition: transform 0.1s ease;
+            transition: all 0.2s;
         }
         .color-box:hover {
             transform: scale(1.1);
             border-color: var(--primary-color);
+            box-shadow: var(--shadow-soft);
         }
-
 
         /* Modals (Image Cropper, Templates, Font, Color Pickers, Layers, Add/Edit Text) */
         .modal-overlay {
@@ -336,14 +366,15 @@
             background-color: var(--text-light);
             border-radius: var(--border-radius);
             box-shadow: var(--shadow-medium);
-            padding: 20px; /* Reduced padding */
-            max-width: 95vw; /* Wider for better use of mobile screen */
-            max-height: 95vh; /* Taller for better use of mobile screen */
+            padding: 25px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             position: relative;
-            transform: translateY(10px); /* Smaller animation offset */
+            transform: translateY(20px);
             transition: transform 0.3s ease;
         }
         .modal-overlay.active .modal-content {
@@ -352,15 +383,16 @@
 
         .modal-content .close-btn {
             position: absolute;
-            top: 8px; /* Adjusted position */
-            right: 8px; /* Adjusted position */
+            top: 15px;
+            right: 15px;
             background: none;
             border: none;
             color: var(--text-dark);
-            font-size: 1.5em; /* Smaller font size */
-            padding: 3px; /* Reduced padding */
+            font-size: 1.5em;
+            padding: 5px;
             border-radius: 50%;
             transition: background-color 0.2s;
+            cursor: pointer;
         }
         .modal-content .close-btn:hover {
             background-color: var(--bg-light);
@@ -371,45 +403,51 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px; /* Reduced gap */
+            gap: 15px;
         }
         #imageCropperModal .image-preview-container {
-            max-width: 100%;
-            max-height: 300px; /* Reduced height for cropper */
+            width: 100%;
+            max-height: 60vh;
             overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
             background-color: #f0f0f0;
             border: 1px solid #ccc;
+            border-radius: var(--border-radius);
         }
         #imageCropperModal .image-preview-container img {
-            display: block; /* Important for Cropper.js */
-            max-width: 100%; /* Important for Cropper.js */
+            display: block;
+            max-width: 100%;
+            max-height: 100%;
         }
         #imageCropperModal .crop-controls {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px; /* Reduced gap */
+            gap: 10px;
             justify-content: center;
-            margin-top: 10px; /* Reduced margin */
+            margin-top: 15px;
         }
         #imageCropperModal .crop-controls button {
             background-color: var(--accent-color);
             color: var(--text-light);
             border: none;
-            padding: 6px 10px; /* Reduced padding */
-            border-radius: 5px;
+            padding: 8px 15px;
+            border-radius: var(--border-radius);
             cursor: pointer;
-            font-size: 0.8em; /* Smaller font size */
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        #imageCropperModal .crop-controls button:hover {
+            background-color: #2980b9;
         }
         #imageCropperModal .crop-controls button.active {
             background-color: var(--primary-color);
         }
         #imageCropperModal .modal-buttons {
             display: flex;
-            gap: 8px; /* Reduced gap */
-            margin-top: 15px; /* Reduced margin */
+            gap: 10px;
+            margin-top: 20px;
             flex-wrap: wrap;
         }
         #imageCropperModal .modal-buttons button {
@@ -417,18 +455,25 @@
             background-color: var(--accent-color);
             color: var(--text-light);
             border: none;
-            padding: 8px 12px; /* Reduced padding */
-            border-radius: 5px;
+            padding: 12px 20px;
+            border-radius: var(--border-radius);
             cursor: pointer;
-            font-size: 0.9em; /* Smaller font size */
+            font-size: 1em;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 5px; /* Reduced gap */
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        #imageCropperModal .modal-buttons button:hover {
+            background-color: #2980b9;
         }
         #imageCropperModal .modal-buttons button.cancel {
-            background-color: #b0bec5; /* Light grey for cancel */
+            background-color: #b0bec5;
             color: var(--text-dark);
+        }
+        #imageCropperModal .modal-buttons button.cancel:hover {
+            background-color: #95a5a6;
         }
 
         /* Hidden file input */
@@ -439,21 +484,22 @@
         /* Template/Font/Color Picker Modal specific styles */
         .template-grid, .font-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Adjusted grid size */
-            gap: 10px; /* Reduced gap */
-            margin-top: 10px; /* Reduced margin */
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
         }
         .template-item, .font-item {
-            border: 1px solid #ddd; /* Smaller border */
+            border: 1px solid #ddd;
             border-radius: var(--border-radius);
             overflow: hidden;
             cursor: pointer;
-            transition: transform 0.2s, border-color 0.2s;
+            transition: all 0.3s ease;
             box-shadow: var(--shadow-soft);
         }
         .template-item:hover, .font-item:hover {
-            transform: translateY(-2px); /* Smaller hover effect */
+            transform: translateY(-5px);
             border-color: var(--primary-color);
+            box-shadow: var(--shadow-medium);
         }
         .template-item img {
             width: 100%;
@@ -462,54 +508,62 @@
         }
         .template-item p, .font-item p {
             background-color: #f9f9f9;
-            padding: 5px; /* Reduced padding */
+            padding: 10px;
             margin: 0;
-            font-size: 0.8em; /* Smaller font size */
+            font-size: 0.9em;
             text-align: center;
             color: var(--text-dark);
             font-family: 'Poppins', sans-serif;
-            overflow: hidden; /* Prevent text overflow */
-            white-space: nowrap; /* Prevent text wrap */
-            text-overflow: ellipsis; /* Add ellipsis if text overflows */
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
         }
         .font-item p {
-            font-size: 1em; /* Smaller font preview */
-            padding: 10px 5px; /* Reduced padding */
-            min-height: 40px; /* Smaller min-height */
+            font-size: 1.1em;
+            padding: 15px 10px;
+            min-height: 60px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
         .font-item.active {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.5); /* Smaller shadow */
+            box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.3);
         }
 
         /* Color Picker Modal */
-        #textColorPickerModal .color-options, #colorOverlayModal .color-options, #textGradientModal .color-options {
+        #textColorPickerModal .color-options, 
+        #colorOverlayModal .color-options, 
+        #textGradientModal .color-options {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px; /* Reduced gap */
-            margin-top: 15px; /* Reduced margin */
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            margin-top: 20px;
             justify-items: center;
         }
-        #textColorPickerModal .color-option-box, #colorOverlayModal .color-option-box, #textGradientModal .color-option-box {
-            width: 40px; /* Smaller size */
-            height: 40px; /* Smaller size */
+        #textColorPickerModal .color-option-box, 
+        #colorOverlayModal .color-option-box, 
+        #textGradientModal .color-option-box {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            border: 1px solid #ddd; /* Smaller border */
+            border: 2px solid #ddd;
             cursor: pointer;
-            transition: transform 0.1s ease, border-color 0.2s;
+            transition: all 0.2s;
             box-shadow: var(--shadow-soft);
         }
-        #textColorPickerModal .color-option-box:hover, #colorOverlayModal .color-option-box:hover, #textGradientModal .color-option-box:hover {
+        #textColorPickerModal .color-option-box:hover, 
+        #colorOverlayModal .color-option-box:hover, 
+        #textGradientModal .color-option-box:hover {
             transform: scale(1.1);
             border-color: var(--primary-color);
         }
-        #textColorPickerModal input[type="color"], #colorOverlayModal input[type="color"], #textGradientModal input[type="color"] {
+        #textColorPickerModal input[type="color"], 
+        #colorOverlayModal input[type="color"], 
+        #textGradientModal input[type="color"] {
             width: 100%;
-            height: 45px; /* Smaller height */
-            margin-top: 15px; /* Reduced margin */
+            height: 50px;
+            margin-top: 20px;
             padding: 0;
             border: none;
             background: none;
@@ -520,12 +574,13 @@
         #layersPanelModal .modal-content {
             max-width: 95vw;
             max-height: 80vh;
+            width: 400px;
         }
         #layersPanelModal .layer-list {
             display: flex;
-            flex-direction: column-reverse; /* Display top layer at top of list */
-            gap: 8px; /* Reduced gap */
-            margin-top: 10px; /* Reduced margin */
+            flex-direction: column-reverse;
+            gap: 10px;
+            margin-top: 15px;
             max-height: 60vh;
             overflow-y: auto;
             padding-right: 5px;
@@ -535,10 +590,10 @@
             align-items: center;
             background-color: var(--bg-light);
             border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 8px 12px; /* Reduced padding */
+            border-radius: var(--border-radius);
+            padding: 12px 15px;
             cursor: pointer;
-            transition: background-color 0.2s, border-color 0.2s;
+            transition: all 0.2s;
             box-shadow: var(--shadow-soft);
         }
         #layersPanelModal .layer-item:hover {
@@ -547,12 +602,12 @@
         }
         #layersPanelModal .layer-item.active {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.3);
+            box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.3);
             background-color: #f0f0f0;
         }
         #layersPanelModal .layer-item .layer-icon {
-            font-size: 1.1em; /* Smaller font size */
-            margin-right: 8px; /* Reduced margin */
+            font-size: 1.2em;
+            margin-right: 12px;
             color: var(--secondary-color);
         }
         #layersPanelModal .layer-item .layer-name {
@@ -566,12 +621,12 @@
         #layersPanelModal .layer-item .layer-lock-btn {
             background: none;
             border: none;
-            font-size: 1.1em; /* Smaller font size */
+            font-size: 1.2em;
             color: var(--text-dark);
             cursor: pointer;
-            padding: 3px; /* Reduced padding */
+            padding: 5px;
             border-radius: 50%;
-            transition: color 0.2s, background-color 0.2s;
+            transition: all 0.2s;
         }
         #layersPanelModal .layer-item .layer-lock-btn:hover {
             background-color: #ccc;
@@ -581,9 +636,9 @@
         }
         /* Style for partial text coloring example */
         .partial-text-example {
-            font-size: 1em; /* Smaller font size */
+            font-size: 1em;
             text-align: center;
-            margin-top: 10px; /* Reduced margin */
+            margin-top: 15px;
             color: #555;
         }
 
@@ -591,56 +646,68 @@
         #addTextModal h3 {
             font-family: 'Poppins', sans-serif;
             color: var(--secondary-color);
-            margin-bottom: 10px; /* Reduced margin */
+            margin-bottom: 15px;
             text-align: center;
-            font-size: 1.4em; /* Smaller font size */
+            font-size: 1.4em;
         }
         #addTextModal textarea {
-            width: calc(100% - 16px); /* Adjusted width for padding */
-            height: 80px; /* Reduced height */
-            padding: 8px; /* Reduced padding */
+            width: 100%;
+            height: 120px;
+            padding: 15px;
             border: 1px solid #ddd;
-            border-radius: 5px;
-            margin-bottom: 10px; /* Reduced margin */
-            font-size: 0.9em; /* Smaller font size */
+            border-radius: var(--border-radius);
+            margin-bottom: 15px;
+            font-size: 1em;
             resize: vertical;
+            transition: border-color 0.2s;
+        }
+        #addTextModal textarea:focus {
+            border-color: var(--accent-color);
+            outline: none;
         }
         #addTextModal .modal-buttons button {
             flex-grow: 1;
             background-color: var(--accent-color);
             color: var(--text-light);
             border: none;
-            padding: 8px 12px; /* Reduced padding */
-            border-radius: 5px;
+            padding: 12px 20px;
+            border-radius: var(--border-radius);
             cursor: pointer;
-            font-size: 0.9em; /* Smaller font size */
+            font-size: 1em;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 5px; /* Reduced gap */
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        #addTextModal .modal-buttons button:hover {
+            background-color: #2980b9;
         }
         #addTextModal .modal-buttons button.cancel {
             background-color: #b0bec5;
             color: var(--text-dark);
         }
+        #addTextModal .modal-buttons button.cancel:hover {
+            background-color: #95a5a6;
+        }
         #addTextModal .modal-buttons {
             display: flex;
-            gap: 8px; /* Reduced gap */
-            margin-top: 15px; /* Reduced margin */
+            gap: 10px;
+            margin-top: 20px;
             flex-wrap: wrap;
         }
 
         /* Lock Icon next to zoom controls */
         .lock-icon-area {
             position: absolute;
-            top: 10px; /* Adjusted position */
-            left: 10px; /* Adjusted position */
+            top: 15px;
+            left: 15px;
             display: flex;
             flex-direction: column;
-            gap: 5px;
-            background-color: rgba(33, 33, 33, 0.8);
+            gap: 8px;
+            background-color: rgba(44, 62, 80, 0.9);
             border-radius: var(--border-radius);
-            padding: 5px;
+            padding: 8px;
             box-shadow: var(--shadow-soft);
             z-index: 20;
         }
@@ -648,32 +715,148 @@
             background: none;
             border: none;
             color: var(--text-light);
-            font-size: 1em; /* Smaller font size */
-            padding: 6px; /* Reduced padding */
+            font-size: 1.2em;
+            padding: 8px;
             border-radius: 4px;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: all 0.2s;
         }
-        .lock-icon-area button:hover, .lock-icon-area button:active {
+        .lock-icon-area button:hover, 
+        .lock-icon-area button:active {
             background-color: var(--primary-color);
+            transform: scale(1.1);
         }
         .lock-icon-area button.locked {
             color: var(--primary-color);
         }
 
+        /* Zoom controls */
+        .zoom-controls {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background-color: rgba(44, 62, 80, 0.9);
+            border-radius: var(--border-radius);
+            padding: 8px;
+            box-shadow: var(--shadow-soft);
+            z-index: 20;
+        }
+        .zoom-controls button {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.2em;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .zoom-controls button:hover {
+            background-color: var(--primary-color);
+            transform: scale(1.1);
+        }
+        .zoom-controls button:active {
+            transform: scale(0.95);
+        }
 
+        /* Download format options */
+        .download-options {
+            position: absolute;
+            top: 15px;
+            right: 80px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background-color: rgba(44, 62, 80, 0.9);
+            border-radius: var(--border-radius);
+            padding: 8px;
+            box-shadow: var(--shadow-soft);
+            z-index: 20;
+        }
+        .download-options button {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1em;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .download-options button:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        .download-options button:active {
+            transform: translateY(0);
+        }
+
+        /* Desktop-specific styles */
+        @media (min-width: 768px) {
+            .app-container {
+                margin: 15px;
+            }
+            .top-menu-bar {
+                padding: 0 25px;
+            }
+            .bottom-toolbar {
+                padding: 0 25px;
+            }
+            .property-panel {
+                width: 400px;
+                left: auto;
+                right: 15px;
+                bottom: 15px;
+                border-radius: var(--border-radius);
+                transform: translateY(calc(100% + 15px));
+            }
+            .property-panel.active {
+                transform: translateY(0);
+            }
+            .modal-content {
+                padding: 30px;
+            }
+            .template-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+
+        /* Artboard grid */
+        .artboard-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: var(--artboard-size);
+            height: var(--artboard-size);
+            background-image: 
+                linear-gradient(#ccc 1px, transparent 1px),
+                linear-gradient(90deg, #ccc 1px, transparent 1px);
+            background-size: 20px 20px;
+            background-position: center center;
+            z-index: -1;
+            opacity: 0.3;
+        }
     </style>
 </head>
 <body>
     <div class="app-container">
         <div class="top-menu-bar">
-            <button id="downloadBtn" title="Download Thumbnail"><i class="fas fa-download"></i> Download</button>
-            <button id="clearCanvasBtn" title="Clear Canvas"><i class="fas fa-eraser"></i> Clear</button>
-            <button id="undoBtn" title="Undo" disabled><i class="fas fa-undo"></i> Undo</button>
-            <button id="redoBtn" title="Redo" disabled><i class="fas fa-redo"></i> Redo</button>
+            <div>
+                <button id="downloadBtn" title="Download Thumbnail"><i class="fas fa-download"></i> Download</button>
+                <button id="clearCanvasBtn" title="Clear Canvas"><i class="fas fa-eraser"></i> Clear</button>
+            </div>
+            <div>
+                <button id="undoBtn" title="Undo" disabled><i class="fas fa-undo"></i> Undo</button>
+                <button id="redoBtn" title="Redo" disabled><i class="fas fa-redo"></i> Redo</button>
+            </div>
         </div>
 
         <div class="canvas-area">
+            <div class="artboard-grid"></div>
             <div class="canvas-wrapper">
                 <canvas id="thumbnailCanvas"></canvas>
             </div>
@@ -682,24 +865,31 @@
                 <button id="zoomOutBtn" title="Zoom Out"><i class="fas fa-search-minus"></i></button>
                 <button id="resetZoomBtn" title="Reset Zoom"><i class="fas fa-compress"></i></button>
             </div>
+            <div class="download-options">
+                <button id="downloadPngBtn" title="Download as PNG"><i class="fas fa-file-image"></i> PNG</button>
+                <button id="downloadJpgBtn" title="Download as JPG"><i class="fas fa-file-image"></i> JPG</button>
+                <button id="downloadSvgBtn" title="Download as SVG"><i class="fas fa-file-code"></i> SVG</button>
+            </div>
             <div class="lock-icon-area">
                 <button id="globalLockUnlockBtn" title="Lock/Unlock Selected"><i class="fas fa-lock"></i></button>
             </div>
         </div>
 
         <div class="bottom-toolbar">
-            <button id="addNewTextBtn" title="Add New Text"><i class="fas fa-plus-square"></i></button> <button id="editTextBtn" title="Edit Text" style="display:none;"><i class="fas fa-edit"></i></button> <button id="openTextColorModalBtn" title="Text Color"><i class="fas fa-palette"></i></button>
-            <button id="openFontModalBtn" title="Text Font"><i class="fas fa-text-height"></i></button>
-            <button id="openTextGradientModalBtn" title="Text Gradient"><i class="fas fa-fill"></i></button>
-            <button id="addShapeBtn" title="Add Shape"><i class="fas fa-shapes"></i></button>
-            <button id="addOverlayImageBtn" title="Add Overlay Image"><i class="fas fa-images"></i></button>
-            <button id="setBgImageBtn" title="Set Background Image"><i class="fas fa-image-polaroid"></i></button>
-            <button id="setBgColorBtn" title="Background Color"><i class="fas fa-fill-drip"></i></button>
-            <button id="openColorAdjustmentsBtn" title="Color Adjustments"><i class="fas fa-paint-brush"></i></button>
-            <button id="loadTemplateBtn" title="Load Template"><i class="fas fa-layer-group"></i></button>
-            <button id="canvasSizeBtn" title="Canvas Size"><i class="fas fa-expand-arrows-alt"></i></button>
-            <button id="openLayersPanelBtn" title="Layers"><i class="fas fa-list-alt"></i></button>
-            <button id="deleteObjectBtn" title="Delete Selected"><i class="fas fa-trash-alt"></i></button>
+            <button id="addNewTextBtn" title="Add New Text"><i class="fas fa-plus-square"></i> <span class="toolbar-label">Text</span></button>
+            <button id="editTextBtn" title="Edit Text" style="display:none;"><i class="fas fa-edit"></i> <span class="toolbar-label">Edit</span></button>
+            <button id="openTextColorModalBtn" title="Text Color"><i class="fas fa-palette"></i> <span class="toolbar-label">Color</span></button>
+            <button id="openFontModalBtn" title="Text Font"><i class="fas fa-text-height"></i> <span class="toolbar-label">Font</span></button>
+            <button id="openTextGradientModalBtn" title="Text Gradient"><i class="fas fa-fill"></i> <span class="toolbar-label">Gradient</span></button>
+            <button id="addShapeBtn" title="Add Shape"><i class="fas fa-shapes"></i> <span class="toolbar-label">Shapes</span></button>
+            <button id="addOverlayImageBtn" title="Add Overlay Image"><i class="fas fa-images"></i> <span class="toolbar-label">Image</span></button>
+            <button id="setBgImageBtn" title="Set Background Image"><i class="fas fa-image-polaroid"></i> <span class="toolbar-label">BG Image</span></button>
+            <button id="setBgColorBtn" title="Background Color"><i class="fas fa-fill-drip"></i> <span class="toolbar-label">BG Color</span></button>
+            <button id="openColorAdjustmentsBtn" title="Color Adjustments"><i class="fas fa-paint-brush"></i> <span class="toolbar-label">Adjust</span></button>
+            <button id="loadTemplateBtn" title="Load Template"><i class="fas fa-layer-group"></i> <span class="toolbar-label">Templates</span></button>
+            <button id="canvasSizeBtn" title="Canvas Size"><i class="fas fa-expand-arrows-alt"></i> <span class="toolbar-label">Size</span></button>
+            <button id="openLayersPanelBtn" title="Layers"><i class="fas fa-list-alt"></i> <span class="toolbar-label">Layers</span></button>
+            <button id="deleteObjectBtn" title="Delete Selected"><i class="fas fa-trash-alt"></i> <span class="toolbar-label">Delete</span></button>
         </div>
 
         <div id="propertyPanel" class="property-panel">
@@ -723,9 +913,9 @@
                 <input type="number" id="panelFontSize" min="10">
                
                 <div class="button-row">
-                    <button id="boldBtn" title="Bold"><i class="fas fa-bold"></i></button>
-                    <button id="italicBtn" title="Italic"><i class="fas fa-italic"></i></button>
-                    <button id="underlineBtn" title="Underline"><i class="fas fa-underline"></i></button>
+                    <button id="boldBtn" title="Bold"><i class="fas fa-bold"></i> Bold</button>
+                    <button id="italicBtn" title="Italic"><i class="fas fa-italic"></i> Italic</button>
+                    <button id="underlineBtn" title="Underline"><i class="fas fa-underline"></i> Underline</button>
                 </div>
 
                 <div class="property-group">
@@ -815,16 +1005,17 @@
             <div id="canvasSizeProperties" style="display:none;" class="property-group">
                 <h4>Canvas Size</h4>
                 <label for="canvasWidthInput">Width:</label>
-                <input type="number" id="canvasWidthInput" value="1280" min="100">
+                <input type="number" id="canvasWidthInput" value="5000" min="100">
                 <label for="canvasHeightInput">Height:</label>
-                <input type="number" id="canvasHeightInput" value="720" min="100">
+                <input type="number" id="canvasHeightInput" value="5000" min="100">
                 <div class="button-row">
-                    <button onclick="resizeCanvasToDefault()"><i class="fas fa-undo"></i> Reset to 1280x720</button>
+                    <button onclick="resizeCanvasToDefault()"><i class="fas fa-undo"></i> Reset to 5000x5000</button>
                     <button onclick="applyCanvasSize()"><i class="fas fa-check"></i> Apply Size</button>
                 </div>
             </div>
         </div>
 
+        <!-- Modals -->
         <div id="imageCropperModal" class="modal-overlay">
             <div class="modal-content">
                 <button class="close-btn" onclick="hideModal('imageCropperModal')"><i class="fas fa-times"></i></button>
@@ -873,7 +1064,7 @@
                         <img src="https://via.placeholder.com/200x112/2ecc71/ffffff?text=YouTube+Video" alt="Template 4">
                         <p>YouTube Video</p>
                     </div>
-                    </div>
+                </div>
                 <div class="modal-buttons">
                     <button class="cancel" onclick="hideModal('templateModal')"><i class="fas fa-times"></i> Close</button>
                 </div>
@@ -913,7 +1104,7 @@
                             <div class="font-item" data-font="Merriweather"><p style="font-family: Merriweather;">Merriweather</p></div>
                             <div class="font-item" data-font="Playfair Display"><p style="font-family: 'Playfair Display';">Playfair Display</p></div>
                             <div class="font-item" data-font="Lora"><p style="font-family: Lora;">Lora</p></div>
-                            </div>
+                        </div>
                     </div>
                     <div class="font-group">
                         <h4>বাংলা ফন্ট</h4>
@@ -928,7 +1119,7 @@
                             <div class="font-item" data-font="Moulpali"><p style="font-family: Moulpali;">আমার ফন্ট</p></div>
                             <div class="font-item" data-font="Tiro Bangla"><p style="font-family: 'Tiro Bangla';">আমার ফন্ট</p></div>
                             <div class="font-item" data-font="Monda"><p style="font-family: Monda;">আমার ফন্ট</p></div>
-                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -991,7 +1182,8 @@
                 <button class="close-btn" onclick="hideModal('layersPanelModal')"><i class="fas fa-times"></i></button>
                 <h3>Layers</h3>
                 <div id="layerList" class="layer-list">
-                    </div>
+                    <!-- Layers will be added here dynamically -->
+                </div>
             </div>
         </div>
         
@@ -1018,17 +1210,31 @@
             </div>
         </div>
 
-
+        <div id="addTextModal" class="modal-overlay">
+            <div class="modal-content">
+                <button class="close-btn" onclick="hideModal('addTextModal')"><i class="fas fa-times"></i></button>
+                <h3>Add/Edit Text</h3>
+                <textarea id="textInputArea" placeholder="Enter your text here..."></textarea>
+                <div class="modal-buttons">
+                    <button id="confirmAddUpdateTextBtn"><i class="fas fa-check"></i> Add Text</button>
+                    <button class="cancel" onclick="hideModal('addTextModal')"><i class="fas fa-times"></i> Cancel</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/canvg/3.0.9/canvg.min.js"></script>
 
     <script>
+        // Initialize canvas with large artboard size (5000x5000)
         const canvas = new fabric.Canvas('thumbnailCanvas', {
-            width: 1280,
-            height: 720,
-            backgroundColor: '#ffffff'
+            width: 5000,
+            height: 5000,
+            backgroundColor: '#ffffff',
+            preserveObjectStacking: true
         });
 
         // --- Undo/Redo History ---
@@ -1041,18 +1247,16 @@
                 isRedoing = false;
                 history = history.slice(0, historyPointer + 1);
             }
-            // Include custom properties for locking, image overlays, stroke, shadow, background for text, gradient
             const json = JSON.stringify(canvas.toJSON([
                 'lockMovementX', 'lockMovementY', 'lockRotation', 'lockScalingX', 'lockScalingY',
                 'lockSkewingX', 'lockSkewingY', 'selectable', 'evented', 'hasControls',
-                'overlayColor', 'overlayOpacity', 'compositeOperation', 'clipPath', // For round images
-                'stroke', 'strokeWidth', 'shadow', 'backgroundColor', 'textBackgroundColor', 'textBackgroundRadius', // For text styles
-                'fill' // Ensure fill is included for partial text styling and gradients
+                'overlayColor', 'overlayOpacity', 'compositeOperation', 'clipPath',
+                'stroke', 'strokeWidth', 'shadow', 'backgroundColor', 'textBackgroundColor', 'textBackgroundRadius',
+                'fill'
             ]));
             history.push(json);
             historyPointer = history.length - 1;
             updateUndoRedoButtons();
-            // updateLayersPanel(); // Do not call here to prevent automatic popup
         }
 
         function undo() {
@@ -1063,73 +1267,7 @@
                     canvas.renderAll();
                     updateUndoRedoButtons();
                     hidePropertyPanel();
-                    // Reapply filters and custom properties after loading from JSON
-                    canvas.getObjects().forEach(obj => {
-                        if (obj.type === 'image' && obj.filters && obj.filters.length > 0) {
-                            obj.applyFilters();
-                        }
-                        // Reapply overlay colors (for images)
-                        if (obj.type === 'image' && obj.overlayColor && obj.overlayOpacity !== undefined) { // Check for overlay data
-                            obj.set({
-                                fill: obj.overlayColor,
-                                opacity: obj.overlayOpacity,
-                                compositeOperation: obj.compositeOperation || 'source-over'
-                            });
-                        }
-                        // Reapply text background color, stroke, shadow
-                        if (obj.type === 'i-text') {
-                            obj.set({
-                                backgroundColor: obj.backgroundColor,
-                                shadow: obj.shadow,
-                                stroke: obj.stroke,
-                                strokeWidth: obj.strokeWidth,
-                                textBackgroundColor: obj.textBackgroundColor, // Ensure text background properties are set
-                                textBackgroundRadius: obj.textBackgroundRadius, // For round text background
-                                fill: obj.fill // Ensure fills are applied (including gradients)
-                            });
-                        }
-                        // Set lock state correctly
-                        obj.set({
-                            selectable: obj.selectable,
-                            evented: obj.evented,
-                            hasControls: obj.hasControls,
-                            lockMovementX: obj.lockMovementX,
-                            lockMovementY: obj.lockMovementY,
-                            lockRotation: obj.lockRotation,
-                            lockScalingX: obj.lockScalingX,
-                            lockScalingY: obj.lockScalingY,
-                            lockSkewingX: obj.lockSkewingX,
-                            lockSkewingY: obj.lockSkewingY
-                        });
-                    });
-                    if (canvas.backgroundImage) {
-                        if (canvas.backgroundImage.filters && canvas.backgroundImage.filters.length > 0) {
-                            canvas.backgroundImage.applyFilters();
-                        }
-                        // Apply overlay/compositing to background if it has it (less common for background)
-                        if (canvas.backgroundImage.overlayColor && canvas.backgroundImage.overlayOpacity !== undefined) {
-                            canvas.backgroundImage.set({
-                                fill: canvas.backgroundImage.overlayColor,
-                                opacity: canvas.backgroundImage.overlayOpacity,
-                                compositeOperation: canvas.backgroundImage.compositeOperation || 'source-over'
-                            });
-                        }
-                    }
-                    canvas.renderAll();
-                    updateLayersPanel(); // Update layers panel after undo/redo
-                });
-            }
-        }
-
-        function redo() {
-            if (historyPointer < history.length - 1) {
-                historyPointer++;
-                isRedoing = true;
-                canvas.loadFromJSON(history[historyPointer], function() {
-                    canvas.renderAll();
-                    updateUndoRedoButtons();
-                    hidePropertyPanel();
-                    // Reapply filters and custom properties after loading from JSON
+                    
                     canvas.getObjects().forEach(obj => {
                         if (obj.type === 'image' && obj.filters && obj.filters.length > 0) {
                             obj.applyFilters();
@@ -1165,6 +1303,7 @@
                             lockSkewingY: obj.lockSkewingY
                         });
                     });
+                    
                     if (canvas.backgroundImage) {
                         if (canvas.backgroundImage.filters && canvas.backgroundImage.filters.length > 0) {
                             canvas.backgroundImage.applyFilters();
@@ -1177,8 +1316,73 @@
                             });
                         }
                     }
+                    
                     canvas.renderAll();
-                    updateLayersPanel(); // Update layers panel after undo/redo
+                    updateLayersPanel();
+                });
+            }
+        }
+
+        function redo() {
+            if (historyPointer < history.length - 1) {
+                historyPointer++;
+                isRedoing = true;
+                canvas.loadFromJSON(history[historyPointer], function() {
+                    canvas.renderAll();
+                    updateUndoRedoButtons();
+                    hidePropertyPanel();
+                    
+                    canvas.getObjects().forEach(obj => {
+                        if (obj.type === 'image' && obj.filters && obj.filters.length > 0) {
+                            obj.applyFilters();
+                        }
+                        if (obj.type === 'image' && obj.overlayColor && obj.overlayOpacity !== undefined) {
+                            obj.set({
+                                fill: obj.overlayColor,
+                                opacity: obj.overlayOpacity,
+                                compositeOperation: obj.compositeOperation || 'source-over'
+                            });
+                        }
+                        if (obj.type === 'i-text') {
+                            obj.set({
+                                backgroundColor: obj.backgroundColor,
+                                shadow: obj.shadow,
+                                stroke: obj.stroke,
+                                strokeWidth: obj.strokeWidth,
+                                textBackgroundColor: obj.textBackgroundColor,
+                                textBackgroundRadius: obj.textBackgroundRadius,
+                                fill: obj.fill
+                            });
+                        }
+                        obj.set({
+                            selectable: obj.selectable,
+                            evented: obj.evented,
+                            hasControls: obj.hasControls,
+                            lockMovementX: obj.lockMovementX,
+                            lockMovementY: obj.lockMovementY,
+                            lockRotation: obj.lockRotation,
+                            lockScalingX: obj.lockScalingX,
+                            lockScalingY: obj.lockScalingY,
+                            lockSkewingX: obj.lockSkewingX,
+                            lockSkewingY: obj.lockSkewingY
+                        });
+                    });
+                    
+                    if (canvas.backgroundImage) {
+                        if (canvas.backgroundImage.filters && canvas.backgroundImage.filters.length > 0) {
+                            canvas.backgroundImage.applyFilters();
+                        }
+                        if (canvas.backgroundImage.overlayColor && canvas.backgroundImage.overlayOpacity !== undefined) {
+                            canvas.backgroundImage.set({
+                                fill: canvas.backgroundImage.overlayColor,
+                                opacity: canvas.backgroundImage.overlayOpacity,
+                                compositeOperation: canvas.backgroundImage.compositeOperation || 'source-over'
+                            });
+                        }
+                    }
+                    
+                    canvas.renderAll();
+                    updateLayersPanel();
                 });
             }
         }
@@ -1208,7 +1412,6 @@
             }
         });
 
-
         // --- UI Control & Modal Functions ---
         function showModal(modalId) {
             document.getElementById(modalId).classList.add('active');
@@ -1235,7 +1438,6 @@
             document.getElementById('canvasSizeProperties').style.display = 'none';
             
             const activeObject = canvas.getActiveObject();
-            // Lock/Unlock button is now handled by the globalLockUnlockBtn and layers panel
 
             if (type === 'text') {
                 document.getElementById('textProperties').style.display = 'block';
@@ -1246,18 +1448,15 @@
                     document.getElementById('italicBtn').classList.toggle('active', activeObject.fontStyle === 'italic');
                     document.getElementById('underlineBtn').classList.toggle('active', activeObject.underline);
                     
-                    // Populate text stroke
                     document.getElementById('textStrokeColor').value = activeObject.stroke || '#000000';
                     document.getElementById('textStrokeWidth').value = activeObject.strokeWidth || 0;
 
-                    // Populate text shadow
                     const shadow = activeObject.shadow || {color: '#000000', blur: 0, offsetX: 0, offsetY: 0};
                     document.getElementById('textShadowColor').value = shadow.color;
                     document.getElementById('textShadowBlur').value = shadow.blur;
                     document.getElementById('textShadowOffsetX').value = shadow.offsetX;
                     document.getElementById('textShadowOffsetY').value = shadow.offsetY;
 
-                    // Populate text background
                     document.getElementById('textBgColor').value = activeObject.backgroundColor || '#ffffff';
                     document.getElementById('textBgOpacity').value = activeObject.backgroundColor ? (new fabric.Color(activeObject.backgroundColor).getAlpha()) : 0;
                     document.getElementById('textBgRadius').value = activeObject.textBackgroundRadius || 0;
@@ -1274,13 +1473,13 @@
                     document.getElementById('hueRange').value = filters[3] && filters[3].type === 'HueRotation' ? (filters[3].rotation * 360 / (2 * Math.PI)) : 0;
                 }
             } else if (type === 'shape') {
-                 document.getElementById('shapeProperties').style.display = 'block';
-                 if (activeObject && (activeObject.type === 'rect' || activeObject.type === 'circle' || activeObject.type === 'triangle')) {
-                     document.getElementById('panelShapeColor').value = activeObject.fill;
-                     document.getElementById('panelShapeBorderColor').value = activeObject.stroke || '#000000';
-                     document.getElementById('panelShapeBorderWidth').value = activeObject.strokeWidth || 0;
-                     document.getElementById('panelShapeOpacity').value = activeObject.opacity;
-                 }
+                document.getElementById('shapeProperties').style.display = 'block';
+                if (activeObject && (activeObject.type === 'rect' || activeObject.type === 'circle' || activeObject.type === 'triangle')) {
+                    document.getElementById('panelShapeColor').value = activeObject.fill;
+                    document.getElementById('panelShapeBorderColor').value = activeObject.stroke || '#000000';
+                    document.getElementById('panelShapeBorderWidth').value = activeObject.strokeWidth || 0;
+                    document.getElementById('panelShapeOpacity').value = activeObject.opacity;
+                }
             } else if (type === 'background_color') {
                 document.getElementById('bgColorProperties').style.display = 'block';
                 document.getElementById('panelBgColor').value = canvas.backgroundColor || '#ffffff';
@@ -1289,7 +1488,7 @@
                 document.getElementById('canvasWidthInput').value = canvas.width;
                 document.getElementById('canvasHeightInput').value = canvas.height;
             } else if (type === 'color_adjustments_direct') {
-                document.getElementById('imageProperties').style.display = 'block'; // Ensure image properties are visible for context
+                document.getElementById('imageProperties').style.display = 'block';
                 document.getElementById('colorAdjustments').style.display = 'block';
 
                 const targetObjectForColorAdjust = canvas.getActiveObject() || canvas.backgroundImage;
@@ -1300,7 +1499,6 @@
                     document.getElementById('saturationRange').value = filters[2] && filters[2].type === 'Saturation' ? (filters[2].saturation * 100) + 100 : 100;
                     document.getElementById('hueRange').value = filters[3] && filters[3].type === 'HueRotation' ? (filters[3].rotation * 360 / (2 * Math.PI)) : 0;
                 } else {
-                    // If no image or background image, reset sliders
                     document.getElementById('brightnessRange').value = 100;
                     document.getElementById('contrastRange').value = 100;
                     document.getElementById('saturationRange').value = 100;
@@ -1314,18 +1512,16 @@
         }
 
         // --- Core Fabric.js & Canvas Manipulation Functions ---
-        // Function to add or edit text based on current mode
-        let currentEditingTextObject = null; // Store reference to the text object being edited
+        let currentEditingTextObject = null;
 
         function openAddNewTextModal() {
             document.getElementById('addTextModal').classList.add('active');
-            document.getElementById('textInputArea').value = ''; // Ensure it's empty for new text
+            document.getElementById('textInputArea').value = '';
             document.getElementById('confirmAddUpdateTextBtn').textContent = 'Add Text';
-            document.getElementById('confirmAddUpdateTextBtn').onclick = addTextToCanvas; // Set function for adding
-            currentEditingTextObject = null; // No object is being edited yet
+            document.getElementById('confirmAddUpdateTextBtn').onclick = addTextToCanvas;
+            currentEditingTextObject = null;
         }
 
-        // Original function, now for editing existing text
         function openEditTextModal() {
             const activeObject = canvas.getActiveObject();
             if (activeObject && activeObject.type === 'i-text') {
@@ -1348,7 +1544,7 @@
             const text = new fabric.IText(textValue, {
                 left: canvas.width / 2,
                 top: canvas.height / 2,
-                fontSize: 50,
+                fontSize: 80,
                 fill: '#000000',
                 fontFamily: 'Noto Serif Bengali',
                 fontWeight: '700',
@@ -1373,28 +1569,25 @@
             currentEditingTextObject = null;
         }
 
-
         function addShape(shapeType) {
             let shape;
             const options = {
                 left: canvas.width / 2,
                 top: canvas.height / 2,
-                fill: '#3498db', /* Default blue fill */
-                stroke: '#2980b9', /* Default darker blue border */
+                fill: '#3498db',
+                stroke: '#2980b9',
                 strokeWidth: 2,
                 originX: 'center',
                 originY: 'center',
-                width: 100, /* Default size */
-                height: 100
+                width: 200,
+                height: 200
             };
 
             if (shapeType === 'rect') {
                 shape = new fabric.Rect(options);
             } else if (shapeType === 'circle') {
-                shape = new fabric.Circle({ ...options, radius: 50 });
-            }
-            // For triangle, Fabric.js uses `height` and `width` implicitly to define points
-            else if (shapeType === 'triangle') {
+                shape = new fabric.Circle({ ...options, radius: 100 });
+            } else if (shapeType === 'triangle') {
                 shape = new fabric.Triangle(options);
             }
 
@@ -1408,7 +1601,7 @@
         }
 
         let cropper;
-        let cropperApplyPurpose = ''; /* 'overlay' or 'background' or 're-crop' */
+        let cropperApplyPurpose = '';
 
         function triggerFileInput(inputId) {
             document.getElementById(inputId).click();
@@ -1424,24 +1617,24 @@
                 imageToCropElement.src = e.target.result;
 
                 if (cropper) {
-                    cropper.destroy(); /* Destroy existing cropper instance */
+                    cropper.destroy();
                 }
 
                 cropper = new Cropper(imageToCropElement, {
-                    aspectRatio: NaN, /* Start with free aspect initially */
-                    viewMode: 1, /* Restrict the crop box to not exceed the canvas */
+                    aspectRatio: NaN,
+                    viewMode: 1,
                     movable: true,
                     zoomable: true,
                     rotatable: false,
                     scalable: true,
                     cropBoxMovable: true,
                     cropBoxResizable: true,
-                    autoCropArea: 0.8 /* Auto crop 80% of the image area */
+                    autoCropArea: 0.8
                 });
 
-                document.getElementById('cropAndApplyBtn').style.display = 'block'; /* Show crop button */
+                document.getElementById('cropAndApplyBtn').style.display = 'block';
                 document.querySelectorAll('.crop-aspect-btn').forEach(btn => btn.classList.remove('active'));
-                document.querySelector('.crop-aspect-btn[data-aspect="NaN"]').classList.add('active'); /* Activate Free by default */
+                document.querySelector('.crop-aspect-btn[data-aspect="NaN"]').classList.add('active');
             };
             reader.readAsDataURL(file);
         }
@@ -1465,13 +1658,13 @@
                                 left: activeObject.left,
                                 top: activeObject.top,
                                 opacity: activeObject.opacity,
-                                filters: activeObject.filters || [], // Keep existing filters
-                                overlayColor: activeObject.overlayColor, // Keep overlay color
-                                overlayOpacity: activeObject.overlayOpacity, // Keep overlay opacity
-                                compositeOperation: activeObject.compositeOperation, // Keep composite operation
-                                clipPath: activeObject.clipPath // Keep clipPath for roundness
+                                filters: activeObject.filters || [],
+                                overlayColor: activeObject.overlayColor,
+                                overlayOpacity: activeObject.overlayOpacity,
+                                compositeOperation: activeObject.compositeOperation,
+                                clipPath: activeObject.clipPath
                             });
-                            activeObject.applyFilters(); // Reapply filters
+                            activeObject.applyFilters();
                             canvas.renderAll();
                             saveCanvasState();
                         });
@@ -1482,7 +1675,7 @@
                     img.set({
                         left: canvas.width / 2,
                         top: canvas.height / 2,
-                        scaleX: 0.3, /* Default scale for new images */
+                        scaleX: 0.3,
                         scaleY: 0.3,
                         originX: 'center',
                         originY: 'center'
@@ -1493,16 +1686,16 @@
                     saveCanvasState();
                 });
             } else if (cropperApplyPurpose === 'background') {
-                 fabric.Image.fromURL(croppedDataURL, function(img) {
+                fabric.Image.fromURL(croppedDataURL, function(img) {
                     img.scaleToWidth(canvas.width);
                     img.scaleToHeight(canvas.height);
                     canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
                         scaleX: canvas.width / img.width,
                         scaleY: canvas.height / img.height,
-                        filters: img.filters || [] // Keep existing filters if background
+                        filters: img.filters || []
                     });
                     if (canvas.backgroundImage) {
-                         canvas.backgroundImage.applyFilters();
+                        canvas.backgroundImage.applyFilters();
                     }
                     canvas.renderAll();
                     saveCanvasState();
@@ -1523,11 +1716,11 @@
             });
         });
 
-        function showCropperModal(isExistingImage = false, purpose = 'overlay') { // Added purpose parameter
+        function showCropperModal(isExistingImage = false, purpose = 'overlay') {
             showModal('imageCropperModal');
-            cropperApplyPurpose = purpose; // Set the purpose for when cropAndApplyBtn is clicked
+            cropperApplyPurpose = purpose;
 
-            if (isExistingImage) { // If re-cropping an existing image on canvas
+            if (isExistingImage) {
                 const activeObject = canvas.getActiveObject();
                 if (activeObject && activeObject.type === 'image') {
                     const imgElement = document.getElementById('imageToCrop');
@@ -1546,17 +1739,14 @@
                     alert('রি-ক্রপ করার জন্য অনুগ্রহ করে ক্যানভাসে একটি ছবি নির্বাচন করুন!');
                     hideModal('imageCropperModal');
                 }
-            } else { // New image upload
-                // No image loaded yet, waits for file input change
             }
         }
 
-        // --- Object Roundness (Clipping) ---
         function toggleImageRoundness() {
             const activeObject = canvas.getActiveObject();
             if (activeObject && activeObject.type === 'image') {
                 if (activeObject.clipPath) {
-                    activeObject.clipPath = null; // Remove clipping
+                    activeObject.clipPath = null;
                 } else {
                     const radius = Math.min(activeObject.width, activeObject.height) / 2;
                     activeObject.set({
@@ -1575,11 +1765,10 @@
             }
         }
 
-        // --- Object Locking (handled via Layers Panel and Global Button) ---
         function toggleLockObjectFromGlobalButton() {
             const activeObject = canvas.getActiveObject();
             if (activeObject) {
-                toggleLockObjectFromLayer(activeObject); // Re-use the layer locking logic
+                toggleLockObjectFromLayer(activeObject);
             } else {
                 alert('লক/আনলক করতে অনুগ্রহ করে একটি অবজেক্ট নির্বাচন করুন!');
             }
@@ -1590,8 +1779,8 @@
 
             obj.set({
                 selectable: newSelectableState,
-                evented: newSelectableState, // Respond to events only if selectable
-                hasControls: newSelectableState, // Show controls only if selectable
+                evented: newSelectableState,
+                hasControls: newSelectableState,
                 lockMovementX: !newSelectableState,
                 lockMovementY: !newSelectableState,
                 lockRotation: !newSelectableState,
@@ -1602,15 +1791,15 @@
             });
 
             if (!newSelectableState) {
-                canvas.discardActiveObject(); // Deselect if object is being locked
+                canvas.discardActiveObject();
             } else {
-                canvas.setActiveObject(obj); // Select if object is being unlocked
+                canvas.setActiveObject(obj);
             }
             
             canvas.renderAll();
             saveCanvasState();
-            updateLayersPanel(); // Update layers panel to reflect lock state
-            updateGlobalLockButton(); // Update global lock button state
+            updateLayersPanel();
+            updateGlobalLockButton();
         }
 
         function updateGlobalLockButton() {
@@ -1626,28 +1815,26 @@
             }
         }
 
-        // --- Color Grading / Image Filters ---
         function applyImageFilters() {
             const activeObject = canvas.getActiveObject();
-            let targetObject = null; // The object to apply filters to
+            let targetObject = null;
 
             if (activeObject && activeObject.type === 'image') {
                 targetObject = activeObject;
             } else if (canvas.backgroundImage && canvas.backgroundImage.type === 'image') {
                 targetObject = canvas.backgroundImage;
             } else {
-                // If no image is selected and no background image, reset sliders
                 document.getElementById('brightnessRange').value = 100;
                 document.getElementById('contrastRange').value = 100;
                 document.getElementById('saturationRange').value = 100;
                 document.getElementById('hueRange').value = 0;
-                return; // Exit if no target object
+                return;
             }
 
             const brightness = (parseFloat(document.getElementById('brightnessRange').value) - 100) / 100;
             const contrast = (parseFloat(document.getElementById('contrastRange').value) - 100) / 100;
             const saturation = (parseFloat(document.getElementById('saturationRange').value) - 100) / 100;
-            const hue = (parseFloat(document.getElementById('hueRange').value) * Math.PI * 2) / 360; // Convert degrees to radians
+            const hue = (parseFloat(document.getElementById('hueRange').value) * Math.PI * 2) / 360;
 
             targetObject.filters = targetObject.filters || [];
 
@@ -1671,13 +1858,11 @@
 
             targetObject.applyFilters();
             canvas.renderAll();
-            // saveCanvasState() is called on 'change' event of range inputs
         }
-
 
         function removeBackground() {
             canvas.setBackgroundImage(null, canvas.renderAll.bind(canvas));
-            canvas.backgroundColor = '#ffffff'; /* Reset to white */
+            canvas.backgroundColor = '#ffffff';
             canvas.renderAll();
             saveCanvasState();
         }
@@ -1715,14 +1900,28 @@
             }
         }
 
-        function downloadThumbnail() {
-            const dataURL = canvas.toDataURL({
-                format: 'png',
-                quality: 1.0,
-                multiplier: 2
-            });
+        function downloadThumbnail(format = 'png') {
+            let dataURL;
+            let filename = 'design';
+            
+            if (format === 'svg') {
+                // Convert canvas to SVG
+                const svg = canvas.toSVG();
+                const blob = new Blob([svg], {type: 'image/svg+xml;charset=utf-8'});
+                saveAs(blob, `${filename}.svg`);
+                return;
+            } else {
+                // For PNG and JPG
+                dataURL = canvas.toDataURL({
+                    format: format,
+                    quality: 0.9,
+                    multiplier: 1
+                });
+                filename += format === 'png' ? '.png' : '.jpg';
+            }
+            
             const link = document.createElement('a');
-            link.download = 'youtube_thumbnail.png';
+            link.download = filename;
             link.href = dataURL;
             document.body.appendChild(link);
             link.click();
@@ -1745,7 +1944,7 @@
             canvas.add(new fabric.IText('আপনার থাম্বনেইল ডিজাইন শুরু করুন!', {
                 left: canvas.width / 2,
                 top: canvas.height / 2,
-                fontSize: 60,
+                fontSize: 100,
                 fill: '#555',
                 fontFamily: 'Noto Serif Bengali',
                 fontWeight: '700',
@@ -1756,7 +1955,6 @@
             canvas.renderAll();
         }
 
-        /* --- Template Loading Functions --- */
         function loadTemplate(templateId) {
             if (confirm('টেমপ্লেট লোড করলে বর্তমান ডিজাইন মুছে যাবে। চালিয়ে যেতে চান?')) {
                 canvas.clear();
@@ -1764,38 +1962,38 @@
                 canvas.backgroundColor = '#ffffff';
 
                 if (templateId === 1) {
-                    canvas.backgroundColor = '#f1c40f'; /* Yellow background */
+                    canvas.backgroundColor = '#f1c40f';
                     const text1 = new fabric.IText('ইউটিউব থাম্বনেইল টিপস', {
                         left: canvas.width / 2, top: canvas.height * 0.3,
-                        fontSize: 80, fill: '#e74c3c', fontFamily: 'Baloo Da 2', fontWeight: '700',
+                        fontSize: 120, fill: '#e74c3c', fontFamily: 'Baloo Da 2', fontWeight: '700',
                         originX: 'center', originY: 'center'
                     });
                     const text2 = new fabric.IText('সহজেই তৈরি করুন!', {
                         left: canvas.width / 2, top: canvas.height * 0.6,
-                        fontSize: 50, fill: '#2c3e50', fontFamily: 'Hind Siliguri',
+                        fontSize: 80, fill: '#2c3e50', fontFamily: 'Hind Siliguri',
                         originX: 'center', originY: 'center'
                     });
                     canvas.add(text1, text2);
                 } else if (templateId === 2) {
-                    canvas.backgroundColor = '#3498db'; /* Blue background */
+                    canvas.backgroundColor = '#3498db';
                     fabric.Image.fromURL('https://via.placeholder.com/600x400/2ecc71/ffffff?text=Your+Image', function(img) {
                         img.scaleToWidth(canvas.width * 0.5);
                         img.set({ left: canvas.width * 0.25, top: canvas.height * 0.2, originX: 'center', originY: 'center' });
                         canvas.add(img);
                         const text = new fabric.IText('Creative Layout', {
                             left: canvas.width * 0.7, top: canvas.height * 0.5,
-                            fontSize: 60, fill: '#ffffff', fontFamily: 'Poppins', fontWeight: '700',
+                            fontSize: 90, fill: '#ffffff', fontFamily: 'Poppins', fontWeight: '700',
                             originX: 'center', originY: 'center'
                         });
                         canvas.add(text);
                         const rect = new fabric.Rect({
                             left: canvas.width * 0.7, top: canvas.height * 0.8,
-                            width: 200, height: 60, fill: '#f1c40f',
-                            originX: 'center', originY: 'center', rx: 10, ry: 10
+                            width: 300, height: 90, fill: '#f1c40f',
+                            originX: 'center', originY: 'center', rx: 15, ry: 15
                         });
                         const subText = new fabric.IText('Click Here', {
                             left: canvas.width * 0.7, top: canvas.height * 0.8,
-                            fontSize: 30, fill: '#2c3e50', fontFamily: 'Roboto', fontWeight: 'bold',
+                            fontSize: 45, fill: '#2c3e50', fontFamily: 'Roboto', fontWeight: 'bold',
                             originX: 'center', originY: 'center'
                         });
                         canvas.add(rect, subText);
@@ -1803,39 +2001,39 @@
                         saveCanvasState();
                     });
                 } else if (templateId === 3) {
-                     canvas.backgroundColor = '#e74c3c'; /* Red background */
+                    canvas.backgroundColor = '#e74c3c';
                     const rect = new fabric.Rect({
                         left: canvas.width / 2, top: canvas.height / 2,
                         width: canvas.width * 0.8, height: canvas.height * 0.6,
                         fill: 'rgba(0,0,0,0.4)',
                         originX: 'center', originY: 'center',
-                        rx: 20, ry: 20 /* Rounded corners */
+                        rx: 30, ry: 30
                     });
                     const text = new fabric.IText('WOW! New Video', {
                         left: canvas.width / 2, top: canvas.height * 0.4,
-                        fontSize: 90, fill: '#ffffff', fontFamily: 'Oswald', fontWeight: '700',
+                        fontSize: 120, fill: '#ffffff', fontFamily: 'Oswald', fontWeight: '700',
                         originX: 'center', originY: 'center'
                     });
-                     const subText = new fabric.IText('Don\'t Miss Out!', {
+                    const subText = new fabric.IText('Don\'t Miss Out!', {
                         left: canvas.width / 2, top: canvas.height * 0.6,
-                        fontSize: 40, fill: '#f1c40f', fontFamily: 'Roboto',
+                        fontSize: 60, fill: '#f1c40f', fontFamily: 'Roboto',
                         originX: 'center', originY: 'center'
                     });
                     canvas.add(rect, text, subText);
                 } else if (templateId === 4) {
-                    canvas.backgroundColor = '#2ecc71'; /* Green background */
+                    canvas.backgroundColor = '#2ecc71';
                     fabric.Image.fromURL('https://via.placeholder.com/300x300/f1c40f/ffffff?text=Profile', function(img) {
                         img.scaleToWidth(canvas.width * 0.2);
                         img.set({ left: canvas.width * 0.15, top: canvas.height * 0.5, originX: 'center', originY: 'center', clipPath: new fabric.Circle({ radius: img.width / 2, originX: 'center', originY: 'center'}) });
                         canvas.add(img);
                         const text1 = new fabric.IText('How to Make', {
                             left: canvas.width * 0.6, top: canvas.height * 0.3,
-                            fontSize: 70, fill: '#ffffff', fontFamily: 'Permanent Marker',
+                            fontSize: 100, fill: '#ffffff', fontFamily: 'Permanent Marker',
                             originX: 'center', originY: 'center'
                         });
                         const text2 = new fabric.IText('Awesome Thumbnails!', {
                             left: canvas.width * 0.6, top: canvas.height * 0.6,
-                            fontSize: 60, fill: '#2c3e50', fontFamily: 'Luckiest Guy',
+                            fontSize: 90, fill: '#2c3e50', fontFamily: 'Luckiest Guy',
                             originX: 'center', originY: 'center'
                         });
                         canvas.add(text1, text2);
@@ -1852,8 +2050,8 @@
         /* --- Canvas Zoom/Pan --- */
         let currentZoom = 1;
         const zoomStep = 0.1;
-        const maxZoom = 2;
-        const minZoom = 0.5;
+        const maxZoom = 3;
+        const minZoom = 0.1;
 
         function zoomIn() {
             currentZoom = Math.min(maxZoom, currentZoom + zoomStep);
@@ -1872,12 +2070,7 @@
 
         function updateCanvasZoom() {
             const canvasWrapper = document.querySelector('.canvas-wrapper');
-            const originalWidth = 1280; /* The Fabric.js canvas's fixed width */
-            const currentWrapperWidth = canvasWrapper.offsetWidth; /* Current actual width of the wrapper */
-
-            const baseZoom = currentWrapperWidth / originalWidth;
-            
-            canvas.setZoom(currentZoom * baseZoom);
+            canvas.setZoom(currentZoom);
             canvas.renderAll();
         }
         
@@ -1911,43 +2104,38 @@
         }
 
         function resizeCanvasToDefault() {
-            document.getElementById('canvasWidthInput').value = 1280;
-            document.getElementById('canvasHeightInput').value = 720;
+            document.getElementById('canvasWidthInput').value = 5000;
+            document.getElementById('canvasHeightInput').value = 5000;
             applyCanvasSize();
         }
 
         /* --- Layers Panel Functions --- */
         function updateLayersPanel() {
             const layerListDiv = document.getElementById('layerList');
-            layerListDiv.innerHTML = ''; // Clear existing list
+            layerListDiv.innerHTML = '';
 
-            // Get all objects from canvas, including background image
-            let objects = canvas.getObjects().slice(); // Create a copy
+            let objects = canvas.getObjects().slice();
             if (canvas.backgroundImage) {
-                 // Fabric.js objects array doesn't include background. We add it manually.
-                 // We need a unique identifier. Let's use a custom property.
-                 const bgObj = Object.assign({}, canvas.backgroundImage); // Shallow copy
-                 bgObj.type = 'image'; // Ensure type is set for identification
-                 bgObj.name = 'Background Image'; // Give it a name for the panel
-                 bgObj._isBackground = true; // Custom flag
-                 // Background image doesn't have selectable/evented by default, simulate for UI
-                 bgObj.selectable = canvas.backgroundImage.selectable !== undefined ? canvas.backgroundImage.selectable : false; // Default to not selectable
-                 bgObj.evented = canvas.backgroundImage.evented !== undefined ? canvas.backgroundImage.evented : false;
-                 objects.unshift(bgObj); // Add to the beginning of the list
+                const bgObj = Object.assign({}, canvas.backgroundImage);
+                bgObj.type = 'image';
+                bgObj.name = 'Background Image';
+                bgObj._isBackground = true;
+                bgObj.selectable = canvas.backgroundImage.selectable !== undefined ? canvas.backgroundImage.selectable : false;
+                bgObj.evented = canvas.backgroundImage.evented !== undefined ? canvas.backgroundImage.evented : false;
+                objects.unshift(bgObj);
             }
 
             objects.forEach((obj, index) => {
                 const layerItem = document.createElement('div');
                 layerItem.className = 'layer-item';
-                // Highlight active object
+                
                 if (canvas.getActiveObject() === obj) {
                     layerItem.classList.add('active');
-                } else if (obj._isBackground && canvas.backgroundImage === canvas.getActiveObject()) { // If background is somehow active (e.g. from filter panel)
-                    // This case is unlikely with the current UI where background isn't activatable
+                } else if (obj._isBackground && canvas.backgroundImage === canvas.getActiveObject()) {
                 }
 
                 let layerName = 'Unknown Object';
-                let layerIcon = 'fas fa-square'; // Default icon
+                let layerIcon = 'fas fa-square';
                 if (obj.type === 'i-text') {
                     layerName = obj.text.length > 20 ? obj.text.substring(0, 20) + '...' : obj.text || `Text Layer ${index}`;
                     layerIcon = 'fas fa-font';
@@ -1968,7 +2156,7 @@
                     layerIcon = 'fas fa-object-group';
                 }
 
-                const isLocked = !obj.selectable; // Check the actual selectable state
+                const isLocked = !obj.selectable;
                 layerItem.innerHTML = `
                     <i class="${layerIcon} layer-icon"></i>
                     <span class="layer-name">${layerName}</span>
@@ -1978,20 +2166,15 @@
                 `;
 
                 layerItem.addEventListener('click', (e) => {
-                    // Only select if not background image
                     if (!obj._isBackground) {
                         canvas.setActiveObject(obj);
                         canvas.renderAll();
-                        // hideModal('layersPanelModal'); // Do not hide modal automatically
-                    } else {
-                         // If background is clicked, just close panel.
-                         // hideModal('layersPanelModal');
                     }
                 });
 
                 const lockButton = layerItem.querySelector('.layer-lock-btn');
                 lockButton.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Prevent layer item click event from propagating to item selection
+                    e.stopPropagation();
                     if (obj._isBackground) {
                         alert('ব্যাকগ্রাউন্ড ইমেজকে সরাসরি লেয়ার প্যানেল থেকে লক/আনলক করা যাবে না। অনুগ্রহ করে ক্যানভাসে ছবি হিসেবে যোগ করুন যদি এটিকে লক/আনলক করতে চান।');
                     } else {
@@ -2001,35 +2184,33 @@
 
                 layerListDiv.appendChild(layerItem);
             });
-            showModal('layersPanelModal'); // Show modal after update
+            showModal('layersPanelModal');
         }
 
-
         /* --- Event Listeners and Canvas Responsiveness --- */
-        addInitialGuidingText(); /* Initial text */
+        addInitialGuidingText();
 
-        /* IMPORTANT: Selection event listeners for property panel and toolbar */
         canvas.on('selection:created', function(e) {
             if (e.target) { 
                 if (e.target.type === 'i-text') {
                     showPropertyPanel('text');
                     document.getElementById('modalTextColorInput').value = e.target.getSelectionStyles()[0]?.fill || e.target.fill || '#000000';
-                    document.getElementById('editTextBtn').style.display = 'block'; // Show Edit Text button
+                    document.getElementById('editTextBtn').style.display = 'block';
                 } else {
-                    document.getElementById('editTextBtn').style.display = 'none'; // Hide Edit Text button
+                    document.getElementById('editTextBtn').style.display = 'none';
                 }
                 if (e.target.type === 'image') {
                     showPropertyPanel('image');
                 } else if (e.target.type === 'rect' || e.target.type === 'circle' || e.target.type === 'triangle') {
                     showPropertyPanel('shape');
                 }
-                updateGlobalLockButton(); // Update global lock button state
+                updateGlobalLockButton();
             }
         });
 
         canvas.on('selection:updated', function(e) {
             if (e.target) {
-                 if (e.target.type === 'i-text') {
+                if (e.target.type === 'i-text') {
                     showPropertyPanel('text');
                     document.getElementById('modalTextColorInput').value = e.target.getSelectionStyles()[0]?.fill || e.target.fill || '#000000';
                     document.getElementById('editTextBtn').style.display = 'block';
@@ -2047,8 +2228,8 @@
 
         canvas.on('selection:cleared', function() {
             hidePropertyPanel();
-            document.getElementById('editTextBtn').style.display = 'none'; // Hide Edit Text button
-            updateGlobalLockButton(); // Update global lock button state
+            document.getElementById('editTextBtn').style.display = 'none';
+            updateGlobalLockButton();
         });
 
         /* --- Property Panel Input Listeners --- */
@@ -2070,11 +2251,9 @@
         });
         document.getElementById('panelFontSize').addEventListener('change', saveCanvasState);
 
-        /* Text Color Change Listener for MODAL picker */
         document.getElementById('modalTextColorInput').addEventListener('input', function() {
             const activeObject = canvas.getActiveObject();
             if (activeObject && activeObject.type === 'i-text') {
-                // Apply to selection if active selection, else to whole text
                 if (activeObject.isEditing && activeObject.selectionStart !== activeObject.selectionEnd) {
                     activeObject.setSelectionStyles({ fill: this.value });
                 } else {
@@ -2085,12 +2264,11 @@
         });
         document.getElementById('modalTextColorInput').addEventListener('change', saveCanvasState); 
 
-        /* Apply Text Color from Modal button */
         function applyTextColorFromModal() {
             const activeObject = canvas.getActiveObject();
             const selectedColor = document.getElementById('modalTextColorInput').value;
             if (activeObject && activeObject.type === 'i-text') {
-                 if (activeObject.isEditing && activeObject.selectionStart !== activeObject.selectionEnd) {
+                if (activeObject.isEditing && activeObject.selectionStart !== activeObject.selectionEnd) {
                     activeObject.setSelectionStyles({ fill: selectedColor });
                 } else {
                     activeObject.set({ fill: selectedColor });
@@ -2101,7 +2279,6 @@
             hideModal('textColorPickerModal');
         }
 
-        /* Click listeners for color palette in modal */
         document.querySelectorAll('#textColorPickerModal .color-option-box').forEach(box => {
             box.addEventListener('click', function() {
                 const color = this.dataset.color;
@@ -2110,7 +2287,6 @@
             });
         });
 
-        /* Font style buttons (Bold, Italic, Underline) */
         document.getElementById('boldBtn').addEventListener('click', function() {
             const activeObject = canvas.getActiveObject();
             if (activeObject && activeObject.type === 'i-text') {
@@ -2139,7 +2315,6 @@
             }
         });
 
-        /* Text Stroke */
         document.getElementById('textStrokeColor').addEventListener('input', function() {
             const activeObject = canvas.getActiveObject();
             if (activeObject && activeObject.type === 'i-text') {
@@ -2158,7 +2333,6 @@
         });
         document.getElementById('textStrokeWidth').addEventListener('change', saveCanvasState);
 
-        /* Text Shadow */
         function updateTextShadow() {
             const activeObject = canvas.getActiveObject();
             if (activeObject && activeObject.type === 'i-text') {
@@ -2182,8 +2356,6 @@
         document.getElementById('textShadowOffsetX').addEventListener('change', saveCanvasState);
         document.getElementById('textShadowOffsetY').addEventListener('change', saveCanvasState);
 
-
-        /* Text Background */
         function updateTextBackground() {
             const activeObject = canvas.getActiveObject();
             if (activeObject && activeObject.type === 'i-text') {
@@ -2205,8 +2377,6 @@
         document.getElementById('textBgOpacity').addEventListener('change', saveCanvasState);
         document.getElementById('textBgRadius').addEventListener('change', saveCanvasState);
 
-
-        /* Image Opacity */
         document.getElementById('panelOpacity').addEventListener('input', function() {
             const activeObject = canvas.getActiveObject();
             if (activeObject && activeObject.type === 'image') {
@@ -2216,7 +2386,6 @@
         });
         document.getElementById('panelOpacity').addEventListener('change', saveCanvasState);
 
-        /* Shape Properties */
         document.getElementById('panelShapeColor').addEventListener('input', function() {
             const activeObject = canvas.getActiveObject();
             if (activeObject && (activeObject.type === 'rect' || activeObject.type === 'circle' || activeObject.type === 'triangle')) {
@@ -2253,10 +2422,8 @@
         });
         document.getElementById('panelShapeOpacity').addEventListener('change', saveCanvasState);
 
-
-        /* Background Color picker in Property Panel */
         document.getElementById('panelBgColor').addEventListener('input', function() {
-            canvas.setBackgroundImage(null, canvas.renderAll.bind(canvas)); /* Remove image if any */
+            canvas.setBackgroundImage(null, canvas.renderAll.bind(canvas));
             canvas.backgroundColor = this.value;
             canvas.renderAll();
         });
@@ -2273,11 +2440,9 @@
             });
         });
 
-        /* Canvas Size controls in Property Panel */
         document.getElementById('canvasWidthInput').addEventListener('change', applyCanvasSize);
         document.getElementById('canvasHeightInput').addEventListener('change', applyCanvasSize);
 
-        /* Color Adjustments for Images/Background Image */
         document.getElementById('brightnessRange').addEventListener('input', applyImageFilters);
         document.getElementById('contrastRange').addEventListener('input', applyImageFilters);
         document.getElementById('saturationRange').addEventListener('input', applyImageFilters);
@@ -2287,16 +2452,17 @@
         document.getElementById('saturationRange').addEventListener('change', saveCanvasState);
         document.getElementById('hueRange').addEventListener('change', saveCanvasState);
 
-
         /* --- Top Menu Bar Button Event Listeners --- */
-        document.getElementById('downloadBtn').addEventListener('click', downloadThumbnail);
+        document.getElementById('downloadBtn').addEventListener('click', function() {
+            downloadThumbnail('png');
+        });
         document.getElementById('clearCanvasBtn').addEventListener('click', clearCanvas);
         document.getElementById('undoBtn').addEventListener('click', undo);
         document.getElementById('redoBtn').addEventListener('click', redo);
         
         /* --- Bottom Toolbar Button Event Listeners --- */
-        document.getElementById('addNewTextBtn').addEventListener('click', openAddNewTextModal); // NEW: Opens modal for adding new text
-        document.getElementById('editTextBtn').addEventListener('click', openEditTextModal); // For editing existing text
+        document.getElementById('addNewTextBtn').addEventListener('click', openAddNewTextModal);
+        document.getElementById('editTextBtn').addEventListener('click', openEditTextModal);
         
         document.getElementById('openTextColorModalBtn').addEventListener('click', function() {
             const activeObject = canvas.getActiveObject();
@@ -2323,7 +2489,6 @@
             }
         });
 
-        /* Apply font from modal */
         document.querySelectorAll('#fontSelectionModal .font-item').forEach(item => {
             item.addEventListener('click', function() {
                 const activeObject = canvas.getActiveObject();
@@ -2337,15 +2502,13 @@
             });
         });
 
-        /* Text Gradient */
         document.getElementById('openTextGradientModalBtn').addEventListener('click', function() {
             const activeObject = canvas.getActiveObject();
             if (activeObject && activeObject.type === 'i-text') {
-                // Populate initial colors if gradient already exists
                 if (activeObject.fill && activeObject.fill.colorStops) {
                     document.getElementById('gradientColor1').value = activeObject.fill.colorStops[0].color;
                     document.getElementById('gradientColor2').value = activeObject.fill.colorStops[1].color;
-                } else { // Default to red and blue
+                } else {
                     document.getElementById('gradientColor1').value = '#ff0000';
                     document.getElementById('gradientColor2').value = '#0000ff';
                 }
@@ -2368,18 +2531,16 @@
                 const color1 = document.getElementById('gradientColor1').value;
                 const color2 = document.getElementById('gradientColor2').value;
                 const activeDirectionBtn = document.querySelector('#textGradientModal .gradient-direction button.active');
-                const directionAngle = activeDirectionBtn ? parseInt(activeDirectionBtn.dataset.direction) : 0; // Default to 0 deg (horizontal)
+                const directionAngle = activeDirectionBtn ? parseInt(activeDirectionBtn.dataset.direction) : 0;
 
-                let coords; // Gradient coordinates
-                // Gradients are tricky with scaling. For Fabric.js IText, coordinates are relative to the bounding box of the text object.
-                // We'll calculate based on activeObject.width and activeObject.height
-                if (directionAngle === 0) { // Horizontal
+                let coords;
+                if (directionAngle === 0) {
                     coords = { x1: 0, y1: activeObject.height / 2, x2: activeObject.width, y2: activeObject.height / 2 };
-                } else if (directionAngle === 90) { // Vertical
+                } else if (directionAngle === 90) {
                     coords = { x1: activeObject.width / 2, y1: 0, x2: activeObject.width / 2, y2: activeObject.height };
-                } else if (directionAngle === 45) { // Diagonal (top-left to bottom-right)
+                } else if (directionAngle === 45) {
                     coords = { x1: 0, y1: 0, x2: activeObject.width, y2: activeObject.height };
-                } else if (directionAngle === 135) { // Diagonal (top-right to bottom-left)
+                } else if (directionAngle === 135) {
                     coords = { x1: activeObject.width, y1: 0, x2: 0, y2: activeObject.height };
                 }
                 
@@ -2399,7 +2560,6 @@
             hideModal('textGradientModal');
         }
 
-
         document.getElementById('addShapeBtn').addEventListener('click', () => showModal('addShapeModal'));
         document.getElementById('addOverlayImageBtn').addEventListener('click', () => showCropperModal(false, 'overlay'));
         document.getElementById('setBgImageBtn').addEventListener('click', () => showCropperModal(false, 'background'));
@@ -2407,7 +2567,7 @@
         document.getElementById('openColorAdjustmentsBtn').addEventListener('click', () => showPropertyPanel('color_adjustments_direct'));
         document.getElementById('loadTemplateBtn').addEventListener('click', () => showModal('templateModal'));
         document.getElementById('canvasSizeBtn').addEventListener('click', () => showPropertyPanel('canvas_size'));
-        document.getElementById('openLayersPanelBtn').addEventListener('click', updateLayersPanel); // Open Layers modal
+        document.getElementById('openLayersPanelBtn').addEventListener('click', updateLayersPanel);
         document.getElementById('deleteObjectBtn').addEventListener('click', deleteSelectedObject);
 
         /* Zoom controls action buttons */
@@ -2415,12 +2575,22 @@
         document.getElementById('zoomOutBtn').addEventListener('click', zoomOut);
         document.getElementById('resetZoomBtn').addEventListener('click', resetZoom);
 
+        /* Download format buttons */
+        document.getElementById('downloadPngBtn').addEventListener('click', function() {
+            downloadThumbnail('png');
+        });
+        document.getElementById('downloadJpgBtn').addEventListener('click', function() {
+            downloadThumbnail('jpeg');
+        });
+        document.getElementById('downloadSvgBtn').addEventListener('click', function() {
+            downloadThumbnail('svg');
+        });
+
         /* Lock Object Button in Property Panel */
-        document.getElementById('globalLockUnlockBtn').addEventListener('click', toggleLockObjectFromGlobalButton); // Global lock button
+        document.getElementById('globalLockUnlockBtn').addEventListener('click', toggleLockObjectFromGlobalButton);
 
         /* Image Roundness button */
         document.getElementById('toggleImageRoundnessBtn').addEventListener('click', toggleImageRoundness);
-
 
         /* Color Overlay Modal for images */
         document.getElementById('overlayColorInput').addEventListener('input', function() {
@@ -2442,13 +2612,12 @@
                 const color = this.dataset.color;
                 document.getElementById('overlayColorInput').value = color;
                 const activeObject = canvas.getActiveObject();
-                 if (activeObject && activeObject.type === 'image') {
+                if (activeObject && activeObject.type === 'image') {
                     activeObject.set({ fill: color, overlayColor: color });
                     canvas.renderAll();
                 }
             });
         });
-
 
         /* --- Canvas Responsiveness and Initial Setup --- */
         function resizeCanvas() {
@@ -2460,39 +2629,36 @@
             const aspectRatio = 16 / 9;
 
             if (availableWidth / availableHeight > aspectRatio) { 
-                 newHeight = availableHeight;
-                 newWidth = availableHeight * aspectRatio;
+                newHeight = availableHeight;
+                newWidth = availableHeight * aspectRatio;
             } else { 
-                 newWidth = availableWidth;
-                 newHeight = availableWidth / aspectRatio;
+                newWidth = availableWidth;
+                newHeight = availableWidth / aspectRatio;
             }
             
             const canvasWrapper = document.querySelector('.canvas-wrapper');
             canvasWrapper.style.width = `${newWidth}px`;
             canvasWrapper.style.height = `${newHeight}px`;
 
-            updateCanvasZoom(); 
+            updateCanvasZoom();
         }
 
         window.addEventListener('resize', resizeCanvas);
         window.addEventListener('orientationchange', resizeCanvas);
-        resizeCanvas(); /* Initial resize on load */
+        resizeCanvas();
 
         // Custom render function for text background radius
-        // This is a workaround as Fabric.js does not natively support rounded corners for text background.
-        // It draws a rounded rectangle behind the text manually.
         fabric.IText.prototype._renderTextBackground = function(ctx) {
             if (!this.backgroundColor && !this.textBackgroundRadius) {
                 return;
             }
             let dim = this._getTextWidthHeight(ctx, this.text);
-            ctx.fillStyle = this.backgroundColor || 'transparent'; // Use background color
+            ctx.fillStyle = this.backgroundColor || 'transparent';
             
             const textLeft = -dim.width / 2;
             const textTop = -dim.height / 2;
             const radius = this.textBackgroundRadius || 0;
 
-            // Draw rounded rectangle
             ctx.beginPath();
             ctx.moveTo(textLeft + radius, textTop);
             ctx.lineTo(textLeft + dim.width - radius, textTop);
@@ -2506,7 +2672,6 @@
             ctx.closePath();
             ctx.fill();
         };
-
     </script>
 </body>
 </html>
